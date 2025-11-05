@@ -1,0 +1,35 @@
+package com.example.sookwalk.screens
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.NotificationsNone
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+// TopBar 함수 호출 시, 현재 화면의 이름을 함께 넘긴다
+fun TopBar(screenName: String) {
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = { /* Handle settings click */ }) {
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+            }
+        },
+        title = { Text(screenName) },
+        actions = {
+            IconButton(onClick = { /* Handle settings click */ }) {
+                Icon(Icons.Default.NotificationsNone, contentDescription = "Notifications")
+            }
+            IconButton(onClick = { /* Handle settings click */ }) {
+                Icon(Icons.Default.Menu, contentDescription = "Navigation Drawer")
+            }
+        }
+    )
+}
