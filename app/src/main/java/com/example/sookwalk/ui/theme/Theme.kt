@@ -1,5 +1,6 @@
 package com.example.sookwalk.ui.theme
 
+import android.R.color.white
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,6 +34,24 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val CustomLightColorScheme = lightColorScheme(
+    primary = Mint80,
+    onPrimary = Black,
+    secondary = Green50,
+    tertiary = Green20,
+    surface = Mint60,
+    background = White
+)
+
+private val CustomDarkColorScheme = darkColorScheme(
+    primary = Black80,
+    onPrimary = White,
+    secondary = Black40,
+    tertiary = Black40,
+    surface = Black40,
+    background = Black60
+)
+
 @Composable
 fun SookWalkTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -46,8 +65,8 @@ fun SookWalkTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> CustomDarkColorScheme
+        else -> CustomLightColorScheme
     }
 
     MaterialTheme(
