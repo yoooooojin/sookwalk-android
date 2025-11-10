@@ -1,5 +1,6 @@
 package com.example.sookwalk.auth
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,7 +57,7 @@ fun LoginScreen(
     // backStackEntry: NavBackStackEntry
 ) {
 
-    Scaffold{ padding ->
+    Scaffold { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,7 +71,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // 앱 소개 문구
-                Column{
+                Column {
                     Text(
                         "숙명에서의 한 걸음,",
                         style = MaterialTheme.typography.titleLarge,
@@ -98,40 +99,64 @@ fun LoginScreen(
 
                 // 아이디 입력 textfield
                 var id by remember { mutableStateOf("") }
+
                 TextField(
                     value = id,
                     onValueChange = { id = it },
-                    label = { Text("아이디")},
+                    label = { Text("아이디") },
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
+
+                    // TextField 색깔 지정
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color(0xFFF4F4F4),
+                        focusedContainerColor = Color(0xFFF4F4F4),
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedLabelColor = Color.Gray,
+                        focusedLabelColor = Color.Gray,
+                        cursorColor = Color.DarkGray
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 비밀번호 입력 textfield
                 var password by remember { mutableStateOf("") }
-                var isVisible by remember { mutableStateOf(false)}
+                var isVisible by remember { mutableStateOf(false) }
 
                 TextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("비밀번호")},
+                    label = { Text("비밀번호") },
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
 
                     // 입력된 비밀번호를 '*'로 변환
-                    visualTransformation = if(isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
 
                     // 비밀번호용 키보드
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
 
                     // 비밀번호 visible 여부 (눈 아이콘)
                     trailingIcon = {
-                        val icon = if(isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                        IconButton(onClick = { isVisible = !isVisible} ){
+                        val icon =
+                            if (isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                        IconButton(onClick = { isVisible = !isVisible }) {
                             Icon(imageVector = icon, contentDescription = "비밀번호 보기")
                         }
-                    }
+                    },
+
+                    // TextField 색깔 지정
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color(0xFFF4F4F4),
+                        focusedContainerColor = Color(0xFFF4F4F4),
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedLabelColor = Color.Gray,
+                        focusedLabelColor = Color.Gray,
+                        cursorColor = Color.DarkGray
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -146,7 +171,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
                     shape = RoundedCornerShape(24.dp)
-                ){
+                ) {
                     Text("로그인")
                 }
 
@@ -157,7 +182,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(0.7f),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     Text(
                         "저희 앱이 처음이시라면?"
                     )
@@ -165,7 +190,7 @@ fun LoginScreen(
                     Text(
                         "회원가입",
                         modifier = Modifier
-                            .clickable{ /* 회원가입 화면 이동 */ }
+                            .clickable { /* 회원가입 화면 이동 */ }
                     )
                 }
             }
