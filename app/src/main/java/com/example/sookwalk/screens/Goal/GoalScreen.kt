@@ -23,7 +23,7 @@ import com.example.sookwalk.ui.theme.SookWalkTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalScreenM3(
+fun GoalScreen(
     onMenuClick: () -> Unit
 ) {
     Scaffold(
@@ -44,10 +44,10 @@ fun GoalScreenM3(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             // 1. M3 DatePicker를 사용한 캘린더 카드
-            CalendarCardM3()
+            CalendarCard()
             Spacer(modifier = Modifier.height(24.dp))
             // 2. M3 ListItem을 사용한 챌린지 카드
-            ChallengesCardM3()
+            ChallengesCard()
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -57,7 +57,7 @@ fun GoalScreenM3(
 // --- 2. 캘린더 카드 (M3 DatePicker 사용) ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarCardM3() {
+fun CalendarCard() {
     // M3 DatePicker의 상태를 기억합니다.
     val datePickerState = rememberDatePickerState(
         // 초기 선택된 날짜 (Epoch Millis) - 2025년 8월 17일
@@ -99,7 +99,7 @@ fun CalendarCardM3() {
 
 // --- 3. 챌린지 카드 (M3 ListItem 사용) ---
 @Composable
-fun ChallengesCardM3() {
+fun ChallengesCard() {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -250,6 +250,6 @@ data class BottomNavItem(val label: String, val icon: ImageVector) // 데이터 
 @Composable
 fun GoalScreenM3Preview() {
     SookWalkTheme(dynamicColor = false) {
-        GoalScreenM3(onMenuClick = {})
+        GoalScreen(onMenuClick = {})
     }
 }
