@@ -33,7 +33,7 @@ fun GoalScreen(
                 onMenuClick = onMenuClick
             )
         },
-        bottomBar = { GoalBottomNavigationM3() },
+        bottomBar = { GoalBottomNavigation() },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
@@ -188,7 +188,7 @@ fun ChallengeListItem(title: String, subtitle: String) {
 
 // --- 4. 하단 네비게이션 (M3 NavigationBar) ---
 @Composable
-fun GoalBottomNavigationM3() {
+fun GoalBottomNavigation() {
     var selectedItem by remember { mutableStateOf(1) } // "Goals"가 선택된 상태
     val items = listOf(
         BottomNavItem("Home", Icons.Default.Home),
@@ -207,8 +207,6 @@ fun GoalBottomNavigationM3() {
 
             NavigationBarItem(
                 icon = {
-                    // M3에서도 아이콘을 Box로 감싸서
-                    // 원하는 디자인 (원형 배경)을 구현할 수 있습니다.
                     Box(
                         modifier = Modifier
                             .clip(CircleShape)
@@ -230,13 +228,12 @@ fun GoalBottomNavigationM3() {
                 label = { Text(item.label, fontSize = 11.sp) },
                 selected = isSelected,
                 onClick = { selectedItem = index },
-                // M3의 기본 인디케이터(알약 모양)를 사용하지 않기 위해 비활성화
-                // 대신 위에서 icon을 직접 커스텀했습니다.
-                colors = NavigationBarItemDefaults.colors(
-                    selectedTextColor = MaterialTheme.colorScheme.surface,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent // 인디케이터 색상을 투명하게
-                ),
+
+//                colors = NavigationBarItemDefaults.colors(
+////                    selectedTextColor = MaterialTheme.colorScheme.surface,
+//                    unselectedTextColor = Color.Gray,
+//                    indicatorColor = Color.Transparent // 인디케이터 색상을 투명하게
+//                ),
                 alwaysShowLabel = true // 항상 라벨 표시
             )
         }
@@ -248,7 +245,7 @@ data class BottomNavItem(val label: String, val icon: ImageVector) // 데이터 
 
 @Preview(showBackground = true)
 @Composable
-fun GoalScreenM3Preview() {
+fun GoalScreenPreview() {
     SookWalkTheme(dynamicColor = false) {
         GoalScreen(onMenuClick = {})
     }
