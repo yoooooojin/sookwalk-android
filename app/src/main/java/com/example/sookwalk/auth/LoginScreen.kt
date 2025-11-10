@@ -31,12 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.example.sookwalk.R
-import com.example.sookwalk.ui.theme.Grey80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +60,20 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("숙명에서의 한 걸음,")
-                Text("SookWalk와 함께 시작하세요 ")
+                // 앱 소개 문구
+                Column{
+                    Text(
+                        "숙명에서의 한 걸음,",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "   SookWalk와 함께 시작하세요",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -69,7 +81,7 @@ fun LoginScreen(
                     painter = painterResource(id = R.drawable.main_image),
                     contentDescription = "앱 메인 이미지",
                     modifier = Modifier
-                        .padding(12.dp)
+                        .padding(8.dp)
                         .fillMaxWidth()
                 )
 
@@ -83,7 +95,6 @@ fun LoginScreen(
                     label = { Text("아이디")},
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
-
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
