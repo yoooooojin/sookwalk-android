@@ -13,9 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
@@ -101,12 +110,28 @@ fun LoginScreen(
 
                 // 비밀번호 입력 textfield
                 var password by remember { mutableStateOf("") }
+                var isVisible by remember { mutableStateOf(false)}
+
                 TextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("비밀번호")},
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
+
+                    // 입력된 비밀번호를 '*'로 변환
+                    visualTransformation = if(isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+
+                    // 비밀번호용 키보드
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+
+                    // 비밀번호 visible 여부 (눈 아이콘)
+                    trailingIcon = {
+                        val icon = if(isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                        IconButton(onClick = { isVisible = !isVisible} ){
+                            Icon(imageVector = icon, contentDescription = "비밀번호 보기")
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
