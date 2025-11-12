@@ -110,7 +110,7 @@ fun SignUpAccountScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    Text("다음")
+                    Text("다음", style = MaterialTheme.typography.displaySmall)
                 }
             }
         }
@@ -131,8 +131,8 @@ fun SignUpAccountScreen(
 
                         // 아이디 입력 문구
                         Row {
-                            Text("아이디 ")
-                            Text(" *", color = Color.Red)
+                            Text("아이디 ", style = MaterialTheme.typography.bodyLarge)
+                            Text(" *", color = Color.Red, style = MaterialTheme.typography.bodyLarge)
                         }
 
                         // 아이디 입력 TextField
@@ -170,7 +170,7 @@ fun SignUpAccountScreen(
                                     vertical = 8.dp
                                 )
                             ) {
-                                Text("중복 확인")
+                                Text("중복 확인", style = MaterialTheme.typography.displaySmall)
                             }
                         }
 
@@ -182,8 +182,8 @@ fun SignUpAccountScreen(
                 item {
                     Column(modifier = Modifier.padding(8.dp)) {
                         Row {
-                            Text("비밀번호 ")
-                            Text(" *", color = Color.Red)
+                            Text("비밀번호 ", style = MaterialTheme.typography.bodyLarge)
+                            Text(" *", color = Color.Red, style = MaterialTheme.typography.bodyLarge)
                         }
 
                         // 비밀번호 입력 TextField
@@ -223,8 +223,8 @@ fun SignUpAccountScreen(
                 item {
                     Column(modifier = Modifier.padding(8.dp)) {
                         Row {
-                            Text("비밀번호 확인 ")
-                            Text(" *", color = Color.Red)
+                            Text("비밀번호 확인 ", style = MaterialTheme.typography.bodyLarge)
+                            Text(" *", color = Color.Red, style = MaterialTheme.typography.bodyLarge)
                         }
 
                         // 비밀번호 확인 TextField
@@ -266,8 +266,8 @@ fun SignUpAccountScreen(
                 item {
                     Column(modifier = Modifier.padding(8.dp)) {
                         Row {
-                            Text("숙명 구글 이메일 ")
-                            Text(" *", color = Color.Red)
+                            Text("숙명 구글 이메일 ", style = MaterialTheme.typography.bodyLarge)
+                            Text(" *", color = Color.Red, style = MaterialTheme.typography.bodyLarge)
                         }
 
                         // 이메일 입력 TextField
@@ -294,8 +294,8 @@ fun SignUpAccountScreen(
                 item {
                     Column(modifier = Modifier.padding(8.dp)) {
                         Row {
-                            Text("인증번호 ")
-                            Text(" *", color = Color.Red)
+                            Text("인증번호 ", style = MaterialTheme.typography.bodyLarge)
+                            Text(" *", color = Color.Red, style = MaterialTheme.typography.bodyLarge)
                         }
 
                         // 인증 번호 입력 TextField
@@ -331,7 +331,7 @@ fun SignUpAccountScreen(
                                 ),
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                             ) {
-                                Text("인증 확인")
+                                Text("인증 확인", style = MaterialTheme.typography.displaySmall)
                             }
                         }
                     }
