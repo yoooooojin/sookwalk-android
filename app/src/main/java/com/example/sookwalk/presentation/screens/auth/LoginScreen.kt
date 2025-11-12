@@ -1,4 +1,4 @@
-package com.example.sookwalk.auth
+package com.example.sookwalk.presentation.screens.auth
 
 import android.R.attr.onClick
 import androidx.compose.foundation.Image
