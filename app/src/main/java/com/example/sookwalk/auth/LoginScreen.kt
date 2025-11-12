@@ -170,7 +170,7 @@ fun LoginScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth(0.9f),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(28.dp)
                 ) {
                     Text("로그인")
                 }
