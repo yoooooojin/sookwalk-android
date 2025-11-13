@@ -88,7 +88,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Image(
-                    painter = painterResource(id = R.drawable.main_image),
+                    painter = painterResource(id = R.drawable.ic_walking_man),
                     contentDescription = "앱 메인 이미지",
                     modifier = Modifier
                         .padding(8.dp)
