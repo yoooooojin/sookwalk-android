@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+
+    alias(libs.plugins.google.secrets)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -80,4 +83,9 @@ dependencies {
     // DataStore (Preferences)
     implementation(libs.androidx.datastore.preferences)
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Maps Compose 의존성 추가
+    implementation(libs.maps.compose)
+    // 현재 위치(FusedLocation)용
+    implementation(libs.play.services.location)
 }
