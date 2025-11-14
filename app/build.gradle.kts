@@ -90,9 +90,23 @@ dependencies {
     implementation(libs.play.services.location)
     // 현재 위치 기반 지도 표시
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    // Places and Maps SDKs
+    implementation("com.google.android.libraries.places:places:5.0.0")
 
     // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
 
     implementation("com.google.firebase:firebase-analytics")
+
+    // Retrofit + OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+
+    implementation("androidx.lifecycle:lifecyce-viewmodel-compose:2.8.0")
+
 }
