@@ -40,7 +40,10 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import android.Manifest
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.Font
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,23 +147,37 @@ fun MapScreen(
         containerColor = MaterialTheme.colorScheme.background,
 
         floatingActionButton = {
-            Column(
-                horizontalAlignment = Alignment.Start
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 // 리센터(현재 위치로 이동)
-                ExtendedFloatingActionButton(
+                FloatingActionButton(
                     onClick = {
                         scope.launch { moveToLastKnownLocation() }
                     },
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    icon = { Icon(Icons.Default.MyLocation, contentDescription = "현재 위치로 이동") },
-                    text = { Text("현재 위치로", fontWeight = FontWeight.SemiBold) }
-                )
-                Spacer(Modifier.height(12.dp))
+                ) {
+                    Icon(
+                        Icons.Default.MyLocation,
+                        contentDescription = "현재 위치로 이동"
+                    )
+                }
+
+//                Spacer(Modifier.height(12.dp))
+
+                // 즐겨찾기 FAB
+                FloatingActionButton(
+                    onClick = { /* 별 버튼 클릭 시 동작 */ },
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                ){
+                    Icon(Icons.Default.Star, contentDescription = "Favorites", tint = Color.White)
+                }
             }
         }
-
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             GoogleMap(
