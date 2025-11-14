@@ -134,37 +134,6 @@ fun MapScreen(
         },
         bottomBar = { ChallengeCreateBottomNavigation() },
         containerColor = MaterialTheme.colorScheme.background,
-
-        floatingActionButton = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                // 리센터(현재 위치로 이동)
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch { moveToLastKnownLocation() }
-                    },
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ) {
-                    Icon(
-                        Icons.Default.MyLocation,
-                        contentDescription = "현재 위치로 이동"
-                    )
-                }
-
-                // 즐겨찾기 FAB
-                FloatingActionButton(
-                    onClick = { /* 별 버튼 클릭 시 동작 */ },
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                ){
-                    Icon(Icons.Default.Star, contentDescription = "Favorites", tint = Color.White)
-                }
-            }
-        }
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             GoogleMap(
@@ -191,6 +160,34 @@ fun MapScreen(
                 active = active,
                 onActiveChange = { active = it }
             )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .fillMaxWidth()
+                    .padding(end = 16.dp, bottom = 80.dp), // 네비바와 충돌 방지
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                // 현재 위치로 이동
+                FloatingActionButton(
+                    onClick = { scope.launch { moveToLastKnownLocation() } },
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.MyLocation, contentDescription = "현재 위치로 이동")
+                }
+
+                // 즐겨찾기 FAB
+                FloatingActionButton(
+                    onClick = { /* 별 클릭 */ },
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = "Favorites", tint = Color.White)
+                }
+            }
 
             // 권한이 없을 때 안내 배너
             if (!isLocationEnabled) {
