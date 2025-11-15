@@ -1,4 +1,4 @@
-package com.example.sookwalk.screens
+package com.example.sookwalk.presentation.components
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
