@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,24 +19,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,12 +48,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sookwalk.R
 import com.example.sookwalk.presentation.components.TopBar
-import com.google.common.io.Files.append
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +65,10 @@ fun MyPageEditScreen(
     // navController: NavController,
     // backStackEntry: NavBackStackEntry
 ) {
+
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     var nickname by remember { mutableStateOf("") } // 임시로 사용, 실제로는 ViewModel로 구현
     var isAvailableNickname by remember { mutableStateOf("") }
@@ -94,29 +99,7 @@ fun MyPageEditScreen(
             )
         },
 
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                Button(
-                    onClick = { /* 페이지 이동 로직 */ },
-                    shape = RoundedCornerShape(28),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("수정 완료", style = MaterialTheme.typography.displaySmall)
-                }
-            }
-        }
-
-    ) { innerPadding ->
+        ) { innerPadding ->
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -143,7 +126,8 @@ fun MyPageEditScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(12.dp)
-                                .clip(CircleShape),
+                                .clip(CircleShape)
+                                .clickable { showBottomSheet = true },
                             contentScale = ContentScale.Crop
                         )
 
@@ -153,7 +137,9 @@ fun MyPageEditScreen(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd) // 박스 하단 끝
                                 .offset(x = (-16).dp, y = (-16).dp) // 안쪽으로 이동하여 겹치게 함
-                                .background(MaterialTheme.colorScheme.tertiary, CircleShape)
+                                .clip(CircleShape)
+                                .clickable { showBottomSheet = true }
+                                .background(MaterialTheme.colorScheme.tertiary)
                                 .padding(12.dp),  // ← 배경 원 크기 증가
                             tint = Color.White
                         )
@@ -295,7 +281,101 @@ fun MyPageEditScreen(
                     }
                 }
 
+                // 수정 완료 버튼
+                item {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+
+                        Button(
+                            onClick = { /* 이전 페이지로 넘어가는 로직 */ },
+                            shape = RoundedCornerShape(28),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text("수정 완료", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                // Sheet content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "프로필 사진 설정",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(bottom=4.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                    }
+                                }
+                                // TODO: 앨범에서 사진 선택 로직
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "앨범에서 사진 선택",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+                    }
+
+                    HorizontalDivider(
+                        color = Color(0x898989),
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                    }
+                                }
+                                // TODO: 기본 이미지로 변경 로직
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "프로필 사진 삭제",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.Red,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+                    }
+                }
             }
         }
     }
 }
+
