@@ -11,5 +11,6 @@ data class UserEntity(
     val email: String,
     var nickname: String,
     var loginId: String,
-    var password: String
+    var password: String,
+    var profileImageUrl: String
 )
