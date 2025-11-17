@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.sookwalk.presentation.screens.member.MyPageEditScreen
 import com.example.sookwalk.presentation.viewmodel.ThemeViewModel
 import com.example.sookwalk.ui.theme.SookWalkTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
             val isDark by themeVM.isDark.collectAsStateWithLifecycle()
 
             SookWalkTheme (darkTheme = isDark){
-
+                MyPageEditScreen()
             }
         }
     }
