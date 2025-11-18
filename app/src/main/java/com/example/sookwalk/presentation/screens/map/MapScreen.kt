@@ -1,3 +1,5 @@
+package com.example.sookwalk.presentation.screens.map
+
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.example.sookwalk.screens.TopBar
 import com.example.sookwalk.ui.theme.SookWalkTheme
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -33,6 +34,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.Alignment
+import com.example.sookwalk.presentation.components.TopBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
