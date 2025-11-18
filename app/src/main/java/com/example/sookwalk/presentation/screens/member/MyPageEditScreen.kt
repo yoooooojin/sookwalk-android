@@ -1,254 +1,164 @@
 package com.example.sookwalk.presentation.screens.member
 
-import androidx.compose.foundation.Image
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.sookwalk.R
 import com.example.sookwalk.presentation.components.TopBar
-import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun MyPageEditScreen(
-    // viewModel: TodoViewModel,
-    // navController: NavController,
-    // backStackEntry: NavBackStackEntry
-) {
-
+fun MyPageEditScreen() {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    var nickname by remember { mutableStateOf("") } // 임시로 사용, 실제로는 ViewModel로 구현
-    var isAvailableNickname by remember { mutableStateOf("") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
+    // 갤러리에서 콘텐츠를 가져오는 런처
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            selectedImageUri = uri
+            showBottomSheet = false
+        }
+    )
+
+    // 권한을 요청하는 런처
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted: Boolean ->
+            if (isGranted) {
+                // 권한이 허용되면 갤러리 런처를 실행
+                galleryLauncher.launch("image/*")
+            } else {
+                // 권한이 거부되면 바텀 시트를 닫음
+                showBottomSheet = false
+            }
+        }
+    )
+
+    // 안드로이드 버전에 따라 필요한 권한을 정의
+    val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+
+    var nickname by remember { mutableStateOf("") }
+    var isAvailableNickname by remember { mutableStateOf("") }
     var major by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
     val departments = listOf(
-        "IP·콘텐츠전공",
-        "IT공학전공",
-        "K-POP산업경영전공",
-        "게임콘텐츠디자인전공",
-        "공공인재학전공",
-        "과학저널리즘전공"
+        "IP·콘텐츠전공", "IT공학전공", "K-POP산업경영전공", "게임콘텐츠디자인전공", "공공인재학전공", "과학저널리즘전공"
     )
 
-    // 🔹 입력된 텍스트가 포함된 전공만 필터링
     val filtered = remember(major) {
-        if (major.isBlank()) departments
-        else departments.filter { it.contains(major, ignoreCase = true) }
+        if (major.isBlank()) departments else departments.filter { it.contains(major, ignoreCase = true) }
     }
 
     Scaffold(
-        topBar = {
-            TopBar(
-                screenName = "마이페이지",
-                onMenuClick = { }
-            )
-        },
-
-        ) { innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize(),
-        ) {
+        topBar = { TopBar(screenName = "마이페이지", onMenuClick = { }) }
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(innerPadding)
-                    .align(Alignment.TopCenter), // 중앙 가로, 세로는 맨 위
+                modifier = Modifier.fillMaxWidth(0.9f).padding(innerPadding).align(Alignment.TopCenter),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // 프로필, 사용자 정보
                 item {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .aspectRatio(1f)
+                        modifier = Modifier.fillMaxWidth(0.7f).aspectRatio(1f)
                     ) {
-                        // 사용자 이미지 받아오는 로직 필요
-                        Image(
-                            // R.drawable.tode는 임시 파일 (깃에 추가 X)
-                            painter = painterResource(id = R.drawable.tode),
+                        AsyncImage(
+                            model = ImageRequest.Builder(context).data(selectedImageUri ?: R.drawable.test).crossfade(true).build(),
                             contentDescription = "Profile Image",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(12.dp)
-                                .clip(CircleShape)
-                                .clickable { showBottomSheet = true },
-                            contentScale = ContentScale.Crop
+                            modifier = Modifier.fillMaxSize().padding(12.dp).clip(CircleShape).clickable { showBottomSheet = true },
+                            contentScale = ContentScale.Crop,
+                            placeholder = painterResource(id = R.drawable.default_profile_image)
                         )
 
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "수정 버튼",
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd) // 박스 하단 끝
-                                .offset(x = (-16).dp, y = (-16).dp) // 안쪽으로 이동하여 겹치게 함
-                                .clip(CircleShape)
-                                .clickable { showBottomSheet = true }
-                                .background(MaterialTheme.colorScheme.tertiary)
-                                .padding(12.dp),  // ← 배경 원 크기 증가
+                            modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-16).dp, y = (-16).dp).clip(CircleShape).clickable { showBottomSheet = true }.background(MaterialTheme.colorScheme.tertiary).padding(12.dp),
                             tint = Color.White
                         )
                     }
                 }
-
-                item {
-                    // 닉네임 수정
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-
-                        Text(
-                            // 사용자 정보 가져오는 로직 나중에 필요
-                            "닉네임",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-
+                // ... (닉네임, 학과 수정 등 나머지 코드는 동일)
+                 item { // 닉네임 수정
+                    Column(modifier = Modifier.padding(8.dp),) {
+                        Text("닉네임", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.align(Alignment.Start))
                         Spacer(modifier = Modifier.width(4.dp))
-
-                        // 닉네임 입력
                         TextField(
-                            value = nickname,
-                            onValueChange = {
-                                nickname = it
-                            },
+                            value = nickname, onValueChange = {nickname = it},
                             placeholder = { Text("변경할 닉네임을 입력하세요") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally)
-                                .padding(start = 4.dp),
+                            modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally).padding(start = 4.dp),
                             singleLine = true,
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Color(0xFFF4F4F4),
-                                focusedContainerColor = Color(0xFFF4F4F4),
-                                unfocusedIndicatorColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                cursorColor = Color.DarkGray
-                            )
+                            colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFF4F4F4), focusedContainerColor = Color(0xFFF4F4F4), unfocusedIndicatorColor = Color.Transparent, focusedIndicatorColor = Color.Transparent, cursorColor = Color.DarkGray)
                         )
-
                         Spacer(modifier = Modifier.height(4.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-
-                            Text(
-                                isAvailableNickname,
-                                color = Color.Red,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Text(isAvailableNickname, color = Color.Red, style = MaterialTheme.typography.labelSmall)
                             Spacer(modifier = Modifier.width(4.dp))
-
                             Button(
                                 onClick = { /* 중복 확인 여부 로직 */ },
                                 shape = RoundedCornerShape(28),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.tertiary,
-                                    contentColor = Color.White
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.White),
                                 modifier = Modifier.padding(8.dp)
                             ) {
                                 Text("중복 확인", style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
-
                 }
-
                 item {
-
                     Column(modifier = Modifier.padding(8.dp)) {
-                        // 소속 학부 입력 문구
-                        Row {
-                            Text("소속 학부 ", style = MaterialTheme.typography.bodyLarge)
-                        }
-
+                        Row { Text("소속 학부 ", style = MaterialTheme.typography.bodyLarge) }
                         Spacer(modifier = Modifier.height(4.dp))
-
                         Column(modifier = Modifier.padding(8.dp)) {
                             TextField(
-                                value = major,
-                                onValueChange = {
-                                    major = it
-                                    expanded = true
-                                },
+                                value = major, onValueChange = { major = it; expanded = true },
                                 placeholder = { Text("소속 학부를 입력하세요") },
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                trailingIcon = {
-                                    Icon(Icons.Default.Search, contentDescription = "검색 아이콘")
-                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                trailingIcon = { Icon(Icons.Default.Search, contentDescription = "검색 아이콘") },
                                 singleLine = true,
-                                colors = TextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color(0xFFF4F4F4),
-                                    focusedContainerColor = Color(0xFFF4F4F4),
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    cursorColor = Color.DarkGray
-                                )
+                                colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFF4F4F4), focusedContainerColor = Color(0xFFF4F4F4), unfocusedIndicatorColor = Color.Transparent, focusedIndicatorColor = Color.Transparent, cursorColor = Color.DarkGray)
                             )
-
-                            // 아래쪽 고정 Dropdown Box
                             if (expanded && filtered.isNotEmpty()) {
-
                                 Column {
                                     filtered.forEach { dept ->
                                         val annotated = buildAnnotatedString {
@@ -256,22 +166,13 @@ fun MyPageEditScreen(
                                             if (startIndex >= 0) {
                                                 val endIndex = startIndex + major.length
                                                 append(dept.substring(0, startIndex))
-                                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                                    append(dept.substring(startIndex, endIndex))
-                                                }
+                                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(dept.substring(startIndex, endIndex)) }
                                                 append(dept.substring(endIndex))
                                             } else append(dept)
                                         }
-
                                         Text(
                                             text = annotated,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    major = dept
-                                                    expanded = false
-                                                }
-                                                .padding(vertical = 8.dp, horizontal = 12.dp),
+                                            modifier = Modifier.fillMaxWidth().clickable { major = dept; expanded = false }.padding(vertical = 8.dp, horizontal = 12.dp),
                                             color = Color.Black
                                         )
                                     }
@@ -280,22 +181,12 @@ fun MyPageEditScreen(
                         }
                     }
                 }
-
-                // 수정 완료 버튼
                 item {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                         Button(
                             onClick = { /* 이전 페이지로 넘어가는 로직 */ },
                             shape = RoundedCornerShape(28),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.tertiary,
-                                contentColor = Color.White
-                            ),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.White),
                             modifier = Modifier.padding(8.dp)
                         ) {
                             Text("수정 완료", style = MaterialTheme.typography.bodySmall)
@@ -303,79 +194,49 @@ fun MyPageEditScreen(
                     }
                 }
             }
-
         }
 
         if (showBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                },
+                onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState
             ) {
-                // Sheet content
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "프로필 사진 설정",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
-                    )
-
-                    HorizontalDivider(modifier = Modifier.padding(bottom=4.dp))
-
+                    Text("프로필 사진 설정", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 16.dp))
+                    HorizontalDivider(modifier = Modifier.padding(bottom = 4.dp))
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            // 권한 상태 확인
+                            when (ContextCompat.checkSelfPermission(context, permissionToRequest)) {
+                                PackageManager.PERMISSION_GRANTED -> {
+                                    // 권한이 이미 있으면 갤러리 실행
+                                    galleryLauncher.launch("image/*")
                                 }
-                                // TODO: 앨범에서 사진 선택 로직
-                            },
+                                else -> {
+                                    // 권한이 없으면 권한 요청 팝업 띄우기
+                                    permissionLauncher.launch(permissionToRequest)
+                                }
+                            }
+                        },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "앨범에서 사진 선택",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(vertical = 12.dp)
-                        )
+                        Text("앨범에서 사진 선택", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 12.dp))
                     }
-
-                    HorizontalDivider(
-                        color = Color(0x898989),
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
-                                }
-                                // TODO: 기본 이미지로 변경 로직
-                            },
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            selectedImageUri = null
+                            showBottomSheet = false
+                        },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "프로필 사진 삭제",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.Red,
-                            modifier = Modifier.padding(vertical = 12.dp)
-                        )
+                        Text("프로필 사진 삭제", style = MaterialTheme.typography.bodyLarge, color = Color.Red, modifier = Modifier.padding(vertical = 12.dp))
                     }
                 }
             }
         }
     }
 }
-
