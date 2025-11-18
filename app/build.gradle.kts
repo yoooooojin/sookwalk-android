@@ -44,8 +44,15 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 dependencies {
@@ -92,6 +99,8 @@ dependencies {
     implementation(libs.play.services.location)
     // 현재 위치 기반 지도 표시
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    // Places and Maps SDKs
+    implementation("com.google.android.libraries.places:places:5.0.0")
 
     // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
@@ -108,4 +117,20 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
+    // Coroutine
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // Firebase (BOM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.functions)
+
+    // Credential Manager + Google ID
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.identity.googleid)
 }
