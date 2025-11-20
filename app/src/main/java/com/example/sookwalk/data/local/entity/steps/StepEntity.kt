@@ -7,7 +7,7 @@ import java.time.Instant
 
 @Entity(tableName = "steps")
 data class DailyStepEntity(
-    @PrimaryKey val date: String, // yyyy-MM-dd
+    @PrimaryKey val date: String,
     val steps: Int
 )
 

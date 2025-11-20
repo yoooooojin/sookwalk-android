@@ -27,9 +27,7 @@ class StepRepository @Inject constructor(
         return stepDao.getSteps(date) ?: 0
     }
 
-    /**
-     * 오늘 걸음수를 delta 만큼 증가시키고, 증가 후 총 합을 리턴
-     */
+    // 오늘 걸음수를 delta 만큼 증가시키고, 증가 후 총 합을 리턴
     suspend fun addStepsForToday(delta: Int): Int {
         val today = LocalDate.now().toString()
         val current = stepDao.getSteps(today) ?: 0
