@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.example.sookwalk.data.local.AppDatabase
 import com.example.sookwalk.data.local.StepDatabase
+import com.example.sookwalk.data.local.dao.GoalDao
+import com.example.sookwalk.data.local.dao.NotificationDao
 import com.example.sookwalk.data.local.dao.StepDao
+import com.example.sookwalk.data.repository.GoalRepository
+import com.example.sookwalk.data.repository.NotificationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,6 +50,29 @@ object AppModule {
     }
 
     */
+
+
+    // Notification
+    @Provides
+    fun provideNotificationDao(appDatabase: AppDatabase): NotificationDao {
+        return appDatabase.notificationDao()
+    }
+
+    @Provides
+    fun provideNotificationRepository(notificationDao: NotificationDao): NotificationRepository {
+        return NotificationRepository(notificationDao)
+    }
+
+    // Goal
+    @Provides
+    fun provideGoalDao(appDatabase: AppDatabase): GoalDao {
+        return appDatabase.goalDao()
+    }
+
+    @Provides
+    fun provideGoalRepository(goalDao: GoalDao): GoalRepository {
+        return GoalRepository(goalDao)
+    }
 
     @Provides
     @Singleton

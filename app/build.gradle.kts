@@ -139,4 +139,6 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material:material")
 
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
