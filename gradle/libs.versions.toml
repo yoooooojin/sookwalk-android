@@ -40,6 +40,9 @@ moshi = "1.15.0"
 coroutines = "1.9.0"
 coroutinesPlay = "1.8.1"
 
+#Firebase
+firebaseBom = "34.5.0"
+
 #Credential
 credentials = "1.5.0"
 googleId = "1.1.1"
@@ -72,7 +75,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
-#Hiltaaaaaaaaaa
+#Hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-lifecycle-vm-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltNavCompose" }
@@ -89,6 +92,8 @@ kotlinx-coroutines-android = {group = "org.jetbrains.kotlinx", name = "kotlinx-c
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlay"}
 
 #Firebase (BOM 사용)
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom"}
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics"}
 firebase-auth = {group = "com.google.firebase", name = "firebase-auth"}
 firebase-firestore = {group = "com.google.firebase", name = "firebase-firestore"}
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions"}
