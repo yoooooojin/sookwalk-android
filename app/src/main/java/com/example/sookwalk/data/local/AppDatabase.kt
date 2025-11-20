@@ -7,8 +7,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.sookwalk.data.local.dao.GoalDao
 import com.example.sookwalk.data.local.dao.NotificationDao
+import com.example.sookwalk.data.local.dao.StepDao
 import com.example.sookwalk.data.local.entity.goal.GoalEntity
 import com.example.sookwalk.data.local.entity.notification.NotificationEntity
+import com.example.sookwalk.data.local.entity.steps.DailyStepEntity
 import com.example.sookwalk.data.local.entity.user.UserEntity
 
 @Database(
