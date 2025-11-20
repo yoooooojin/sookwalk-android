@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.sookwalk.data.local.AppDatabase
 import com.example.sookwalk.data.local.dao.GoalDao
 import com.example.sookwalk.data.local.dao.NotificationDao
+import com.example.sookwalk.data.local.dao.StepDao
 import com.example.sookwalk.data.repository.GoalRepository
 import com.example.sookwalk.data.repository.NotificationRepository
 import dagger.Module
@@ -13,6 +14,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
+import kotlin.jvm.java
 
 
 @Module // 이 클래스가 Hilt에 의존성을 제공함을 알림
@@ -48,6 +50,7 @@ object AppModule {
 
     */
 
+
     // Notification
     @Provides
     fun provideNotificationDao(appDatabase: AppDatabase): NotificationDao {
@@ -68,5 +71,11 @@ object AppModule {
     @Provides
     fun provideGoalRepository(goalDao: GoalDao): GoalRepository {
         return GoalRepository(goalDao)
+    }
+
+    // Step
+    @Provides
+    fun provideStepDao(appDatabase: AppDatabase): StepDao {
+        return appDatabase.stepDao()
     }
 }
