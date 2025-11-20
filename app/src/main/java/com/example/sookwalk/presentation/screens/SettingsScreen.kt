@@ -56,7 +56,8 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        topBar = {TopBar("설정",  {})},
+        topBar = {
+            TopBar("설정",  {}, {}, {})},
     ){ innerPadding ->
         Surface (
             modifier = Modifier.padding(innerPadding)

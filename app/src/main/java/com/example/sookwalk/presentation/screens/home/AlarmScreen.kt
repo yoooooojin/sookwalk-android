@@ -44,7 +44,9 @@ fun AlarmScreen(){
         topBar = {
             TopBar(
                 screenName = "알림",
-                onMenuClick = { }
+                onMenuClick = { },
+                onBack = { },
+                onAlarmClick = { }
             )
         }
     ){ innerPadding ->

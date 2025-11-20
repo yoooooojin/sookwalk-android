@@ -62,7 +62,9 @@ fun RankingScreen(
         topBar ={
             TopBar(
                 "랭킹",
-                onMenuClick = {}
+                onMenuClick = {},
+                onBack = { },
+                onAlarmClick = { }
             )
         }
     ){ innerPadding ->

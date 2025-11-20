@@ -67,7 +67,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopBar("메인 홈",
-                {}
+                {}, {}, {}
                 )}
     ){ innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)){
