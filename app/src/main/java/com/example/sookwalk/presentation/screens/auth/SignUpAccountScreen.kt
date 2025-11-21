@@ -182,9 +182,9 @@ fun SignUpAccountScreen(
 
                             Button(
                                 onClick = {
-                                    val available = viewModel.isLoginIdAvailable
+                                    viewModel.isLoginIdAvailable(loginId)
 
-                                    if (available.value) {
+                                    if (viewModel.isLoginIdAvailable.value) {
                                         isAvailableIdMsg = "사용 가능한 아이디입니다."
                                         isAvailableId = true
                                     } else {

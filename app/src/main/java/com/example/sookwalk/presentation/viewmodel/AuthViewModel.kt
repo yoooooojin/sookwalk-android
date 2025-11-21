@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel @Inject constructor
     (private val repository: AuthRepository): ViewModel()
 {
-    var _isLoginIdAvailable = MutableStateFlow<Boolean>(false)
+    var _isLoginIdAvailable = MutableStateFlow<Boolean>(true)
     val isLoginIdAvailable = _isLoginIdAvailable
 
     val currentUser: StateFlow<UserEntity?>
@@ -33,10 +33,10 @@ class AuthViewModel @Inject constructor
     }
 
     // 아이디 중복 여부 확인
-    fun isLoginIdAvailable(loginId: String) {
+    fun isLoginIdAvailable(loginId: String){
         viewModelScope.launch {
             val available = repository.isLoginIdAvailable(loginId)
-            _isLoginIdAvailable.value = available
+            _isLoginIdAvailable.value = !available
         }
     }
 }
