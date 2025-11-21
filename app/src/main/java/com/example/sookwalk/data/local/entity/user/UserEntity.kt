@@ -3,7 +3,7 @@ package com.example.sookwalk.data.local.entity.user
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "members")
+@Entity(tableName = "users")
 data class UserEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val email: String,
