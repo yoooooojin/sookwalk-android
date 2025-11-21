@@ -1,23 +1,34 @@
 package com.example.sookwalk.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.sookwalk.presentation.screens.SettingsScreen
+import com.example.sookwalk.presentation.screens.auth.LoginScreen
+import com.example.sookwalk.presentation.screens.home.AlarmScreen
+import com.example.sookwalk.presentation.screens.home.HomeScreen
+import com.example.sookwalk.presentation.screens.home.RankingScreen
+import com.example.sookwalk.presentation.viewmodel.GoalViewModel
+import com.example.sookwalk.presentation.viewmodel.NotificationViewModel
+import com.example.sookwalk.presentation.viewmodel.SettingsViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val authViewModel: AuthViewModel = hiltViewModel() // 회원가입
-    val userViewModel: UserViewModel = hiltViewModel() // 마이페이지 등
+//    val authViewModel: AuthViewModel = hiltViewModel() // 회원가입
+//    val userViewModel: UserViewModel = hiltViewModel() // 마이페이지 등
 
     /// 그 외 각자 만든 viewModel들 추가 ( ThemeViewModel 제외 )
     // ....
     // val badgeViewModel: BadgeViewModel = hiltViewModel()
     // ....
     val settingsViewModel: SettingsViewModel = hiltViewModel() // 환경 설정
+    val goalViewModel: GoalViewModel = hiltViewModel()
+    val notificationViewModel: NotificationViewModel = hiltViewModel()
 
-
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = Routes.LOGIN) {
 
         ////// 첫 화면 //////
 
@@ -31,22 +42,22 @@ fun NavGraph(navController: NavHostController) {
         ////// TopBar에서 쓰이는 경로 //////
 
         // 알림 페이지
-        composable("alarm") {
-            AlarmScreen(viewModel, navController)
+        composable(Routes.ALARM) {
+            AlarmScreen(notificationViewModel, navController)
         }
 
         // 마이 페이지
-        composable("myPage") {
+        composable(Routes.MYPAGE) {
             MyPageScreen(userViewModel, navController)
         }
 
         // 뱃지
-        composable("badges") {
+        composable(Routes.BADGES) {
             BadgeScreen(viewModel, navController)
         }
 
         // 환경 설정
-        composale("settings") {
+        composable(Routes.SETTINGS) {
             SettingsScreen(settingsViewModel, navController)
         }
 
@@ -55,7 +66,7 @@ fun NavGraph(navController: NavHostController) {
         ////// 메인 홈에서 특정 버튼 선택 시 쓰이는 경로 /////
 
         // 메인 홈
-        composable("home") {
+        composable(Routes.HOME) {
             HomeScreen(userViewModel, /* 등등..? */ , navController)
         }
 
@@ -65,7 +76,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // 랭킹
-        composable("ranking") {
+        composable(Routes.RANK) {
             RankingScreen(viewModel, navController)
         }
 
