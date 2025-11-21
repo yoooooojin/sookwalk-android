@@ -1,40 +1,38 @@
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+package com.example.sookwalk.presentation.screens.goal
+
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.NotificationsNone
-import androidx.compose.material3.* // Material 3 import
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sookwalk.screens.TopBar
-import com.example.sookwalk.ui.theme.SookWalkTheme
+import androidx.navigation.compose.rememberNavController
+import com.example.sookwalk.presentation.components.BottomNavBar
+import com.example.sookwalk.presentation.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChallengeCreateScreen(
+fun AddGoalScreen(
     onMenuClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopBar(
                 screenName = "25.10.31", // 하드 코딩
-                onMenuClick = onMenuClick
+                onBack = {},
+                onMenuClick = onMenuClick,
+                onAlarmClick = {}
             )
         },
-        bottomBar = { ChallengeCreateBottomNavigation() },
+        bottomBar = { BottomNavBar(navController = rememberNavController()) },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
@@ -70,7 +68,7 @@ fun ChallengeCreateScreen(
     }
 }
 
-// --- 1. 걸음 수 입력 섹션 ---
+// 1. 걸음 수 입력
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StepsInputSection() {
@@ -91,31 +89,33 @@ fun StepsInputSection() {
         label = { Text("걸음 수 입력") },
         modifier = Modifier.fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = Color.Gray,
             unfocusedBorderColor = Color.Gray,
-            cursorColor = MaterialTheme.colorScheme.primary,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = Color.Gray,
+            focusedLabelColor = Color.Gray,
             unfocusedLabelColor = Color.Gray
         ),
         singleLine = true
     )
     Spacer(modifier = Modifier.height(16.dp))
-    FlowRow( // 칩들을 유연하게 배치
+    LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        chipOptions.forEach { chipText ->
+        items(chipOptions) { chipText ->
             FilterChip(
                 selected = (selectedChip == chipText),
                 onClick = { selectedChip = if (selectedChip == chipText) null else chipText },
                 label = { Text(chipText) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                )
             )
         }
     }
 }
 
-// --- 2. 날짜 지정 섹션 ---
+// 2. 날짜 지정
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateSelectionSection() {
@@ -142,10 +142,10 @@ fun DateSelectionSection() {
             readOnly = true, // 직접 입력 대신 DatePicker로 선택
             modifier = Modifier.weight(1f),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = Color.Gray,
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.Gray,
+                focusedLabelColor = Color.Gray,
                 unfocusedLabelColor = Color.Gray
             ),
         )
@@ -160,6 +160,13 @@ fun DateSelectionSection() {
             label = { Text("mm/dd/yyyy") },
             readOnly = true, // 직접 입력 대신 DatePicker로 선택
             modifier = Modifier.weight(1f),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Gray,
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Gray,
+                focusedLabelColor = Color.Gray,
+                unfocusedLabelColor = Color.Gray
+            ),
         )
     }
     Spacer(modifier = Modifier.height(16.dp))
@@ -172,12 +179,15 @@ fun DateSelectionSection() {
                 selected = (selectedDuration == durationText),
                 onClick = { selectedDuration = if (selectedDuration == durationText) null else durationText },
                 label = { Text(durationText) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                )
             )
         }
     }
 }
 
-// --- 3. 메모 섹션 ---
+// 3. 메모
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoSection() {
@@ -198,10 +208,10 @@ fun MemoSection() {
             .fillMaxWidth()
             .height(120.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = Color.Gray,
             unfocusedBorderColor = Color.Gray,
-            cursorColor = MaterialTheme.colorScheme.primary,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = Color.Gray,
+            focusedLabelColor = Color.Gray,
             unfocusedLabelColor = Color.Gray
         ),
         singleLine = false,
@@ -209,7 +219,7 @@ fun MemoSection() {
     )
 }
 
-// --- 4. 작성 완료 버튼 ---
+// 4. 작성 완료 버튼
 @Composable
 fun CompletedButton() {
     Row(
@@ -219,29 +229,13 @@ fun CompletedButton() {
         Button(
             onClick = { /* 작성 완료 로직 */ },
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                contentColor = Color.White
             ),
-            shape = RoundedCornerShape(20.dp),
-            elevation = ButtonDefaults.buttonElevation(4.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.width(120.dp).height(48.dp)
         ) {
-            Text("작성 완료")
+            Text("작성 완료", fontSize = 17.sp)
         }
-    }
-}
-
-// --- 하단 네비게이션 ---
-@Composable
-fun ChallengeCreateBottomNavigation() {
-
-}
-
-// --- 프리뷰 ---
-@Preview(showBackground = true)
-@Composable
-fun ChallengeCreateScreenPreview() {
-    SookWalkTheme(dynamicColor = false) {
-        ChallengeCreateScreen(onMenuClick = {})
     }
 }
