@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +45,7 @@ fun FavoritesBottomSheet(
         // 하드 코딩
         val favorites = listOf(
             FavoriteItem("숙명여대 맛집", "60", Color(0xFF1E5EFF)),
-            FavoriteItem("분홍카", "45", Color(0xFFFFE841)),
+            FavoriteItem("분좋카", "45", Color(0xFFFFE841)),
             FavoriteItem("빵집", "23", Color(0xFF4CCEB5)),
             FavoriteItem("도서관", "12", Color(0xFFBDBDBD))
         )
@@ -84,7 +83,7 @@ fun FavoriteRow(item: FavoriteItem) {
     ){
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(30.dp)
                 .clip(CircleShape)
                 .background(item.iconColor),
             contentAlignment = Alignment.Center
