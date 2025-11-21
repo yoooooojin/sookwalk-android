@@ -47,6 +47,7 @@ firebaseBom = "34.5.0"
 credentials = "1.5.0"
 googleId = "1.1.1"
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -96,6 +97,7 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-auth = {group = "com.google.firebase", name = "firebase-auth"}
 firebase-firestore = {group = "com.google.firebase", name = "firebase-firestore"}
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions"}
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage"}
 
 #AndroidX Credentials
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials"}
@@ -113,4 +115,3 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 google-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 google-services = {id = "com.google.gms.google-services", version.ref = "googleServices"}
-

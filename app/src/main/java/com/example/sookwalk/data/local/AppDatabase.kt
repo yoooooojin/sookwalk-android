@@ -5,23 +5,30 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.sookwalk.data.local.dao.FavoritePlaceDao
-import com.example.sookwalk.data.local.entity.map.CategoryPlaceCrossRef
-import com.example.sookwalk.data.local.entity.map.FavoriteCategoryEntity
-import com.example.sookwalk.data.local.entity.map.FavoritePlaceEntity
+import com.example.sookwalk.data.local.dao.GoalDao
+import com.example.sookwalk.data.local.dao.NotificationDao
+import com.example.sookwalk.data.local.dao.StepDao
+import com.example.sookwalk.data.local.entity.goal.GoalEntity
+import com.example.sookwalk.data.local.entity.notification.NotificationEntity
+import com.example.sookwalk.data.local.entity.steps.DailyStepEntity
+import com.example.sookwalk.data.local.entity.user.UserEntity
 
 @Database(
     entities = [
-        FavoritePlaceEntity::class,
-        FavoriteCategoryEntity::class, // (추가) 그룹
-        CategoryPlaceCrossRef::class
+        UserEntity::class,
+        DailyStepEntity::class,
+        NotificationEntity::class,
+        GoalEntity::class
     ],
-    version = 2,
-    exportSchema = false
-)
+    version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     /* Dao 접근 함수 */
+//    abstract fun userDao(): UserDao
+//    abstract fun stepDao(): StepDao
+    abstract fun notificationDao(): NotificationDao
+    abstract fun goalDao(): GoalDao
+    abstract fun stepDao(): StepDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
@@ -36,6 +43,4 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
     }
-
-    abstract fun favoritePlaceDao(): FavoritePlaceDao
 }
