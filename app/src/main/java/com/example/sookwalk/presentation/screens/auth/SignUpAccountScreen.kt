@@ -51,6 +51,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.functions.functions
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,17 +65,35 @@ fun SignUpAccountScreen(
     var loginId by remember { mutableStateOf("") }
     var isAvailableId by remember { mutableStateOf(false) } // 아이디 사용 가능 여부
     var isAvailableIdMsg by remember { mutableStateOf("") }
+
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") } // 비밀번호 확인
     var isVisible by remember { mutableStateOf(false) } // 비밀번호 가시성
+
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") } // OTP 코드
+    var isTimerRunning by remember { mutableStateOf(false) } // 타이머 동작 여부
+    var timeLeft by remember { mutableStateOf(180) } // 남은 시간 (초 단위, 3분 = 180초)
     var isAuthencated by remember { mutableStateOf(false) } // 이메일 인증 여부
+
     var moveNextEnabled by remember { mutableStateOf(false) } // 다음 페이지 이동
 
     // 모든 요건을 만족하면 다음 페이지로 이동한다
     if (isAvailableId && isAuthencated && password == confirmPassword) {
         moveNextEnabled = true
+    }
+
+    // isTimerRunning이 true가 되면 해당 블록이 실행
+    if (isTimerRunning) {
+        LaunchedEffect(key1 = timeLeft) {
+            // 1초마다 timeLeft 값을 1씩 감소시킵니다.
+            while (timeLeft > 0) {
+                delay(1000L) // 1초 대기
+                timeLeft--
+            }
+            // 시간이 0이 되면 타이머를 멈춥니다.
+            isTimerRunning = false
+        }
     }
 
 
@@ -362,13 +381,29 @@ fun SignUpAccountScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
                         ) {
+                            // --- 타이머 표시 UI ---
+                            if (isTimerRunning) {
+                                // 분과 초를 계산
+                                val minutes = timeLeft / 60
+                                val seconds = timeLeft % 60
+                                Text(
+                                    text = String.format("%02d:%02d", minutes, seconds),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.Red,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
                             Button(
+
                                 onClick = {
                                     Firebase.auth.signInAnonymously()
                                         .addOnCompleteListener { task ->
                                             if (task.isSuccessful) {
-                                                val functions =
-                                                    Firebase.functions("asia-northeast3") // region 설정
+                                                Log.d("Auth", "익명 로그인 성공. OTP 전송을 시작합니다.")
+                                                val functions = Firebase.functions("asia-northeast3") // region 설정
                                                 val sendOtp = functions.getHttpsCallable("sendOtp")
                                                 val user = Firebase.auth.currentUser
 
@@ -383,8 +418,8 @@ fun SignUpAccountScreen(
 
                                                         }
                                                         .addOnFailureListener { e ->
-                                                            Log.e("OTP", "OTP 전송 실패: ${e.message}")
-
+                                                            Log.e("OTP",
+                                                                "OTP 전송 실패: ${e.message}")
                                                         }
                                                 } else {
                                                     Log.e("Auth", "익명 로그인 후 user가 null입니다.")
@@ -394,6 +429,10 @@ fun SignUpAccountScreen(
 
                                             }
                                         }
+
+                                    timeLeft = 180 // 타이머를 3분으로 초기화
+                                    isTimerRunning = true // 타이머 시작
+
                                 },
                                 shape = RoundedCornerShape(28),
                                 colors = ButtonDefaults.buttonColors(
