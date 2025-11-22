@@ -41,6 +41,7 @@ import com.example.sookwalk.presentation.components.TopBar
 import com.example.sookwalk.presentation.viewmodel.UserViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.launch
 
@@ -50,6 +51,8 @@ import kotlinx.coroutines.launch
 fun MyPageEditScreen(
     viewModel: UserViewModel
 ) {
+    val uid = Firebase.auth.currentUser?.uid
+
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -79,7 +82,6 @@ fun MyPageEditScreen(
     // 2. 화면 시작 시, Storage에서 이미지 URL 가져오기
     // LaunchedEffect(true)는 이 Composable이 처음 Composition될 때 딱 한 번만 실행됩니다.
     LaunchedEffect(key1 = true) {
-        val uid = Firebase.auth.currentUser?.uid
         if (uid != null) {
             // 하위 위치를 나타내는 참조 생성
             val storageRef = Firebase.storage.reference.child("images/$uid/profile.jpg")
@@ -371,7 +373,11 @@ fun MyPageEditScreen(
 
                                 // ------------ 닉네임, 학과 관련 -------------
                                 if (isNicknameAvailable ?: false || isChangedMajor) {
-                                    viewModel.updateNicknameAndMajor(nickname, major)
+                                    viewModel.updateNicknameAndMajor(nickname, major) // 룸DB에 저장
+                                    Firebase.firestore.collection("users").document(uid?:"").update(mapOf(
+                                        "nickname" to nickname,
+                                        "major" to major )
+                                    )
                                 }
 
                                 /* 뒤로 가기 로직 */
