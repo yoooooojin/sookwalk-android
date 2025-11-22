@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -64,6 +65,7 @@ fun SignUpProfileScreen(
 ) {
 
     var nickname by remember { mutableStateOf("") }
+    var isAvailableNicknameMsg by remember { mutableStateOf("")}
 
     // 랜덤 닉네임 placeholder 생성
     val randomPlaceholder = remember {
@@ -82,7 +84,7 @@ fun SignUpProfileScreen(
 
     var departments by remember { mutableStateOf<List<String>>(emptyList()) }
 
-// 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
+    // 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
     LaunchedEffect(Unit) {
         val db = Firebase.firestore
         val allMajors = mutableListOf<String>()
@@ -241,9 +243,23 @@ fun SignUpProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
+                        Text(
+                            text = isAvailableNicknameMsg,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         Button(
                             onClick = {
-                                /* 닉네임 중복 확인 로직 */
+                                userViewModel.isNicknameAvailable(finalNickname)
+
+                                if (userViewModel.isAvailableNickname.value) {
+                                    isAvailableNicknameMsg = "사용 가능한 닉네임입니다."
+                                } else {
+                                    isAvailableNicknameMsg = "이미 존재하는 닉네임입니다."
+                                }
                             },
                             shape = RoundedCornerShape(28),
                             colors = ButtonDefaults.buttonColors(
