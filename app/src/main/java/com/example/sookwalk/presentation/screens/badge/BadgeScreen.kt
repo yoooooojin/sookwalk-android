@@ -1,220 +1,269 @@
-import androidx.compose.foundation.BorderStroke
+package com.example.sookwalk.presentation.screens.badge
+
+import com.example.sookwalk.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.WorkspacePremium // 왕관 아이콘
-import androidx.compose.material3.* // Material 3 import
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sookwalk.R
+import androidx.navigation.compose.rememberNavController
+import com.example.sookwalk.presentation.components.BottomNavBar
 import com.example.sookwalk.presentation.components.TopBar
-import com.example.sookwalk.ui.theme.SookWalkTheme
+
+data class BadgeInfo(
+    val title: String?,
+    val level: String?,
+    val imageRes: Int?
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeScreen(
     onMenuClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopBar(
-                screenName = "뱃지",
-                onMenuClick = onMenuClick
-            )
-        },
-        bottomBar = {
-
-        },
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()) // 스크롤 가능하도록
-        ) {
-            // 1. 베스트 뱃지 섹션
-            BestBadgeSection()
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 2. 뱃지 그리드 섹션
-            BadgeGridSection()
-        }
-    }
-}
-
-// --- 1. 베스트 뱃지 섹션 ---
-@Composable
-fun BestBadgeSection() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        // "베스트 뱃지" 타이틀
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
-        ) {
-            Text(
-                "베스트 뱃지",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                Icons.Default.WorkspacePremium,
-                contentDescription = "베스트 뱃지",
-                tint = Color(0xFFFFD700) // 금색
-            )
-        }
-
-        // 베스트 뱃지 카드
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.character_01),
-                    contentDescription = "워킹 마스터 뱃지",
-                    modifier = Modifier.size(100.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "워킹 마스터",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "2025.10.27",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "100000보 걸었습니다!",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    }
-}
-
-// --- 2. 뱃지 그리드 섹션 ---
-@Composable
-fun BadgeGridSection() {
-    // 뱃지 데이터 (샘플)
+    // 샘플 데이터
     val badges = listOf(
         BadgeInfo("워킹 마스터", "레벨 1/10", R.drawable.character_01),
         BadgeInfo("챌린지 고수", "레벨 2/10", R.drawable.character_01),
         BadgeInfo("추억 수집가", "레벨 0/10", R.drawable.character_01),
         BadgeInfo("챔피언 워커", "레벨 1/10", R.drawable.character_01),
         BadgeInfo("의리왕", "레벨 1/10", R.drawable.character_01),
-        BadgeInfo(null, null, null), // 빈 칸
-        BadgeInfo(null, null, null), // 빈 칸
-        BadgeInfo(null, null, null), // 빈 칸
+        BadgeInfo(null, null, null),
+        BadgeInfo(null, null, null),
+        BadgeInfo(null, null, null),
+        BadgeInfo(null, null, null) // 3열을 맞추기 위해 더미 데이터 추가
     )
 
-    // 3열 그리드
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp), // 그리드 영역 높이 (필요에 따라 조절)
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(badges) { badge ->
-            SmallBadgeCard(badge = badge)
+    Scaffold(
+        topBar = {
+            TopBar(
+                screenName = "뱃지",
+                onBack = {},
+                onAlarmClick = {},
+                onMenuClick = onMenuClick
+            )
+        },
+        bottomBar = { BottomNavBar(navController = rememberNavController()) },
+        containerColor = Color.White,
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // 베스트 뱃지 영역
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "베스트 뱃지",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(
+                        imageVector = Icons.Default.WorkspacePremium,
+                        contentDescription = null,
+                        tint = Color(0xFFFFC107),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Box(
+                    modifier = Modifier.padding(horizontal = 40.dp) // ← 이 숫자를 늘리면 카드가 더 작아집니다!
+                ) {
+                    BestBadgeCard()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 하단 뱃지들 영역
+            GreenGridContainer(badges = badges)
         }
     }
 }
 
-// 작은 뱃지 카드
-@OptIn(ExperimentalMaterial3Api::class)
+// 하단 그리드 컨테이너
 @Composable
-fun SmallBadgeCard(badge: BadgeInfo) {
-    OutlinedCard(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.outlinedCardColors(
-            // 디자인처럼 흰색 배경
-            containerColor = MaterialTheme.colorScheme.background
-        ),
-        border = BorderStroke(
-            width = 1.dp, // 테두리 두께 (기본값)
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) // 테두리 색상
-        )
+fun GreenGridContainer(badges: List<BadgeInfo>) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(13.dp, 13.dp, 13.dp) // 외부 여백
+            .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+            .background(MaterialTheme.colorScheme.surface) // 배경색 적용
+            .padding(16.dp) // 내부 여백
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .height(100.dp), // 카드 높이 고정
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (badge.imageRes != null) {
-                Image(
-                    painter = painterResource(id = badge.imageRes),
-                    contentDescription = badge.title,
-                    modifier = Modifier.size(40.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = badge.title ?: "",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = badge.level ?: "",
-                    fontSize = 11.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
-                )
+            // 3개씩 묶어서 Row로 배치
+            badges.chunked(3).forEach { rowBadges ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    for (badge in rowBadges) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            SmallBadgeCard(badge)
+                        }
+                    }
+                    // 갯수가 모자란 행의 빈 공간 채우기
+                    repeat(3 - rowBadges.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
+}
+
+@Composable
+fun BestBadgeCard() {
+    Card(
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(330.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(22.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(0.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.character_01),
+                            contentDescription = null,
+                            modifier = Modifier.size(140.dp)
+                        )
+                        // 매달 아이콘
+                        Icon(
+                            imageVector = Icons.Default.WorkspacePremium,
+                            contentDescription = "1등",
+                            tint = Color(0xFFFFD700),
+                            modifier = Modifier
+                                .size(80.dp) // 뱃지 크기
+                                // 위치 미세 조정
+                                .offset(x = 30.dp, y = (-4).dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = "워킹 마스터",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "2025.10.27",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "100000보 걸었습니다!",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                }
             }
         }
     }
 }
 
-// 뱃지 정보 데이터 클래스
-data class BadgeInfo(
-    val title: String?,
-    val level: String?,
-    val imageRes: Int? // 예시로 Int를 사용 (R.drawable.xxx)
-)
-
-@Preview(showBackground = true)
 @Composable
-fun BadgeScreenPreview() {
-    SookWalkTheme(dynamicColor = false) {
-        BadgeScreen(onMenuClick = {})
+fun SmallBadgeCard(badge: BadgeInfo) {
+    // 빈 데이터 처리
+    if (badge.title == null) {
+        // 빈 칸도 흰색 박스는 그려주되 내용은 비움
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+        ) {}
+        return
+    }
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            badge.imageRes?.let {
+                Image(
+                    painter = painterResource(id = it),
+                    contentDescription = badge.title,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = badge.title ?: "",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                lineHeight = 14.sp
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = badge.level ?: "",
+                fontSize = 10.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
