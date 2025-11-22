@@ -142,7 +142,6 @@ fun PlaceItemUI(data: PlacesData) {
                         .background(Color.LightGray.copy(alpha = 0.3f))
                 ) {
                     // 실제 이미지 넣을 땐 여기에 AsyncImage 사용
-                    // 예: AsyncImage(model = url, contentScale = ContentScale.Crop, ...)
                 }
             }
         }
