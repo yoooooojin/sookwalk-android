@@ -46,6 +46,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.sookwalk.navigation.Routes
 import com.example.sookwalk.presentation.viewmodel.AuthViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -58,7 +60,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SignUpAccountScreen(
     viewModel: AuthViewModel,
-    // navController: NavController,
+    navController: NavController,
     // backStackEntry: NavBackStackEntry
 ) {
 
@@ -105,7 +107,7 @@ fun SignUpAccountScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         // 뒤로가기 로직
-                        // navController?.popBackStack()
+                        navController?.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -129,7 +131,14 @@ fun SignUpAccountScreen(
                 horizontalArrangement = Arrangement.End,
             ) {
                 Button(
-                    onClick = { /* 페이지 이동 로직 */ },
+                    onClick = {
+                        // 입력 정보 viewModel에 저장
+                        viewModel.updateLoginId(loginId)
+                        viewModel.updatePassword(password)
+                        viewModel.updateEmail(email)
+                        // 회원가입 - 프로필 설정 페이지로 이동
+                        navController.navigate(Routes.PROFILE)
+                    },
                     enabled = moveNextEnabled,
                     shape = RoundedCornerShape(28),
                     colors = ButtonDefaults.buttonColors(
