@@ -90,7 +90,7 @@ fun BadgeScreen(
                     )
                 }
                 Box(
-                    modifier = Modifier.padding(horizontal = 40.dp) // ← 이 숫자를 늘리면 카드가 더 작아집니다!
+                    modifier = Modifier.padding(horizontal = 40.dp)
                 ) {
                     BestBadgeCard()
                 }
