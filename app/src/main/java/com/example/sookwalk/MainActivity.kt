@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,15 +15,24 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.sookwalk.navigation.NavGraph
+import com.example.sookwalk.presentation.screens.map.MapScreen
+import com.example.sookwalk.presentation.viewmodel.MapViewModel
 import com.example.sookwalk.presentation.viewmodel.ThemeViewModel
 import com.example.sookwalk.ui.theme.SookWalkTheme
 import com.example.sookwalk.utils.notification.NotificationHelper
+import com.google.android.gms.maps.MapsInitializer
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MapsInitializer.initialize(applicationContext)
+
         enableEdgeToEdge()
         setContent {
             val themeVM: ThemeViewModel = hiltViewModel()
