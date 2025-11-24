@@ -98,7 +98,6 @@ fun AddFavoriteDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 3. 색상 선택 라벨
                 Text(
                     text = "아이콘 색상",
                     fontSize = 14.sp,
@@ -108,10 +107,10 @@ fun AddFavoriteDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // 4. 색상 선택 리스트 (가로 배치)
+                // 색상 선택 리스트 (가로 배치)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween // 간격 균등 배치
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     colorList.forEach { color ->
                         ColorSelectionItem(
@@ -154,7 +153,7 @@ fun ColorSelectionItem(
 ) {
     Box(
         modifier = Modifier
-            .size(32.dp) // 터치 영역 확보
+            .size(32.dp)
             .clip(CircleShape)
             .background(color)
             .clickable { onClick() },
@@ -165,7 +164,7 @@ fun ColorSelectionItem(
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = "Selected",
-                tint = Color.White, // 배경색이 밝으면 Black으로 조정 필요
+                tint = Color.White,
                 modifier = Modifier.size(18.dp)
             )
         }
