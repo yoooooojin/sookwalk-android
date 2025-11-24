@@ -27,7 +27,7 @@ class AuthRepository @Inject constructor(
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
     suspend fun login(loginId: String, password: String): Boolean {
-        val idInFirestore = Firebase.firestore.collection("users")
+        return try { val idInFirestore = Firebase.firestore.collection("users")
             .whereEqualTo("loginId", loginId.trim()) // 공백 제거
             .get()
             .await()
@@ -35,23 +35,16 @@ class AuthRepository @Inject constructor(
         // 아이디가 존재하는지 먼저 확인
         if (idInFirestore.isEmpty) {
             return false
-        }
-
-        // 사용자가 있으면, 이메일을 받아온다
-        val email = idInFirestore.documents.first().get("email") as String
-
-        // 실제 로그인은 FirebaseAuth(email, password)
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                _isLoggedIn.value = task.isSuccessful
-            }
-            .addOnFailureListener {
-                _isLoggedIn.value = false
-            }
-        if(_isLoggedIn.value){
-            return true
         } else {
-            return false
+            val email = idInFirestore.documents.first().getString("email") ?: ""
+            // FirebaseAuth로 로그인 시도, 성공하면 user 객체 반환, 실패하면 예외 발생
+            auth.signInWithEmailAndPassword(email, password).await()
+            _isLoggedIn.value = true
+            true
+        }
+    } catch (e: Exception) {
+            Log.e("LoginFailure", "로그인 실패: ${e.message}")
+            false // 어떤 종류의 예외든 실패로 간주
         }
     }
 
