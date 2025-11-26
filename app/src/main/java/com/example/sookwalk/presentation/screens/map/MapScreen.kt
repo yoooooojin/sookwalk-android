@@ -30,6 +30,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,6 +74,15 @@ fun MapScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    var showFavoritesSheet by remember { mutableStateOf(false) }
+    val favoritesSheetState = rememberModalBottomSheetState()
+
+    var showPlacesSheet by remember { mutableStateOf(false) }
+    // skipPartiallyExpanded = true를 하면 시트가 처음부터 완전히 펼쳐집니다.
+    val placesSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var showAddDialog by remember { mutableStateOf(false) }
+
     // 위치 권한 상태
     var hasFine by remember { mutableStateOf(false) }
     var hasCoarse by remember { mutableStateOf(false) }
@@ -114,6 +124,7 @@ fun MapScreen(
                         context,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
+
         if (!hasLocationPermission) return false
         return try {
             val loc = fused.lastLocation.await()
@@ -132,41 +143,23 @@ fun MapScreen(
         }
     }
 
-    // 지도 스타일 옵션 (선택)
-//    val mapStyle: MapStyleOptions? = remember {
-//        // raw/map_style.json 이 있다면 스타일 적용, 없으면 null
-//        runCatching {
-//            MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
-//        }.getOrNull()
-//    }
-
-    // 지도 프로퍼티/Ui 설정
-    val isLocationEnabled = hasFine || hasCoarse
-//    val mapProperties by remember(isLocationEnabled, mapStyle) {
-//        mutableStateOf(
-//            MapProperties(
-//                isMyLocationEnabled = isLocationEnabled,
-//                mapStyleOptions = mapStyle
-//            )
-//        )
-//    }
     val uiSettings by remember {
         mutableStateOf(
             MapUiSettings(
-                myLocationButtonEnabled = false,   // 기본 내 위치 버튼 숨김
+                myLocationButtonEnabled = false, // 기본 내 위치 버튼 숨김
                 zoomControlsEnabled = false
             )
         )
     }
+
+    val isLocationEnabled = hasFine || hasCoarse
 
     Scaffold(
         bottomBar = { BottomNavBar(navController = rememberNavController()) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Box(
-            Modifier
-                .fillMaxSize()
-//            .padding(padding)
+            Modifier.fillMaxSize()
         ) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
@@ -186,9 +179,6 @@ fun MapScreen(
             var active by remember { mutableStateOf(false) }
 
             Box(modifier = Modifier.padding(top = 90.dp)) {
-                var query by remember { mutableStateOf("") }
-                var active by remember { mutableStateOf(false) }
-
                 MapSearchBar(
                     query = query,
                     onQueryChange = { query = it },
@@ -217,7 +207,7 @@ fun MapScreen(
 
                 // 즐겨찾기 FAB
                 FloatingActionButton(
-                    onClick = { /* 즐겨찾기 BottomSheet */ },
+                    onClick = { showFavoritesSheet = true  },
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.secondary,
                 ) {
@@ -225,38 +215,6 @@ fun MapScreen(
                 }
             }
 
-            // 권한이 없을 때 안내 배너
-            if (!isLocationEnabled) {
-                Surface(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(12.dp),
-                    tonalElevation = 6.dp,
-                    shape = MaterialTheme.shapes.large
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "현재 위치를 보려면 위치 권한이 필요합니다.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        TextButton(onClick = {
-                            // 다시 권한 요청
-                            permissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                )
-                            )
-                        }) {
-                            Text("권한 요청")
-                        }
-                    }
-                }
-            }
             Column(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -267,6 +225,35 @@ fun MapScreen(
                     onBack = onBack,
                     onMenuClick = onMenuClick,
                     onAlarmClick = onAlarmClick
+                )
+            }
+            if (showFavoritesSheet) {
+                FavoritesBottomSheet(
+                    sheetState = favoritesSheetState,
+                    onDismiss = { showFavoritesSheet = false },
+                    onAddClick = {
+                        showAddDialog = true
+                    },
+                    onCategoryClick = {
+                        showFavoritesSheet = false
+                        showPlacesSheet = true
+                    }
+                )
+            }
+
+            if (showPlacesSheet) {
+                PlacesBottomSheet(
+                    sheetState = placesSheetState,
+                    onDismissRequest = { showPlacesSheet = false }
+                )
+            }
+
+            if (showAddDialog) {
+                AddFavoriteDialog(
+                    onDismiss = { showAddDialog = false }, // 바깥 누르면 닫기
+                    onAdd = { name, colorLong ->
+                        showAddDialog = false
+                    }
                 )
             }
         }

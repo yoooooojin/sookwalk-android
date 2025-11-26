@@ -17,13 +17,11 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.example.sookwalk.presentation.screens.map.PlacesBottomSheet
-import com.example.sookwalk.presentation.viewmodel.PlacesViewModel
-import androidx.navigation.compose.rememberNavController
 import com.example.sookwalk.navigation.NavGraph
 import com.example.sookwalk.presentation.viewmodel.ThemeViewModel
 import com.example.sookwalk.ui.theme.SookWalkTheme
 import com.example.sookwalk.utils.notification.NotificationHelper
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,6 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MapsInitializer.initialize(applicationContext)
+
         enableEdgeToEdge()
         setContent {
             val themeVM: ThemeViewModel = hiltViewModel()
@@ -67,16 +68,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDark,
                 dynamicColor = false
             ) {
-                PlacesBottomSheet(
-                    viewModel = viewModel,
-                    onItemClick = { place ->
-                        // 테스트니까 아무 처리 안 해도 됨
-                        Log.d("TEST", "Clicked: ${place.displayName}")
-                    },
-                    onDismiss = {
-                        showSheet = false
-                    }
-                )
+                NavGraph(navController)
             }
         }
     }
