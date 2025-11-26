@@ -55,7 +55,7 @@ fun AddGoalScreen(
                 onAlarmClick = onAlarmClick
             )
         },
-        bottomBar = { BottomNavBar(navController = rememberNavController()) },
+        bottomBar = { BottomNavBar(navController = navController) },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
