@@ -155,7 +155,7 @@ fun MapScreen(
     val isLocationEnabled = hasFine || hasCoarse
 
     Scaffold(
-        bottomBar = { BottomNavBar(navController = rememberNavController()) },
+        bottomBar = { BottomNavBar(navController = navController) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Box(
