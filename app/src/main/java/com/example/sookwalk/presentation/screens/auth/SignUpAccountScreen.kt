@@ -227,7 +227,7 @@ fun SignUpAccountScreen(
                         ) {
                             Text(
                                 text = isAvailableIdMsg,
-                                color = Color.Red,
+                                color = if(isLoginIdAvailable == true) MaterialTheme.colorScheme.tertiary else Color.Red,
                                 style = MaterialTheme.typography.labelSmall
                             )
 
