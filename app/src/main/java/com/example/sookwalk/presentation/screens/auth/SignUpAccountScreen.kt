@@ -82,6 +82,16 @@ fun SignUpAccountScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") } // 비밀번호 확인
     var isVisible by remember { mutableStateOf(false) } // 비밀번호 가시성
+    var isPasswordValid by remember { mutableStateOf(false) } // 비밀번호 조건 체크
+
+    // 유효성 검증
+    fun validatePassword(password: String): Boolean {
+        val hasUpperCase = password.any { it.isUpperCase() }
+        val hasLowerCase = password.any { it.isLowerCase() }
+        val hasSpecialChar = password.any { !it.isLetterOrDigit() }
+        val hasCorrectLength = password.length in 8..16
+        return hasUpperCase && hasLowerCase && hasSpecialChar && hasCorrectLength
+    }
 
     var email by remember { mutableStateOf("") }
     var isEmailAvailable by remember { mutableStateOf(false) } // 숙명 구글 계정 여부
@@ -260,7 +270,10 @@ fun SignUpAccountScreen(
                         // 비밀번호 입력 TextField
                         TextField(
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = {
+                                password = it
+                                isPasswordValid = validatePassword(it)
+                                            },
                             modifier = Modifier
                                 .fillMaxWidth(),
                             singleLine = true,
@@ -285,6 +298,14 @@ fun SignUpAccountScreen(
                                     Icon(imageVector = icon, contentDescription = "비밀번호 보기")
                                 }
                             }
+                        )
+
+                        // 비밀번호 조건 : 8자 이상 ~ 16자 이하, 대/소문자, 특수문자
+                        Text(
+                            text = "대소문자와 특수문자가 포함된 8~16자리의 비밀번호를 입력해주세요.",
+                            color = if (password.isEmpty() || isPasswordValid) MaterialTheme.colorScheme.tertiary else Color.Red,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(4.dp),
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
