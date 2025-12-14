@@ -379,12 +379,15 @@ fun MyPageEditScreen(
                                     uploadImageToFirebase(
                                         imageUri = imageUri,
                                         onSuccess = { downloadUrl ->
+                                            // RoomDB, Firestore에도 저장
+                                            viewModel.updateProfileImageUrl(downloadUrl)
                                             Log.d("UpdateProfile", "이미지 업로드 성공: $downloadUrl")
                                         },
                                         onFailure = { exception ->
                                             Log.e("UpdateProfile", "이미지 업로드 실패", exception)
                                         }
                                     )
+
                                 }
 
                                 // 이미지가 삭제된 경우
@@ -411,13 +414,11 @@ fun MyPageEditScreen(
                                         })
                                 }
 
+
+
                                 // ------------ 닉네임, 학과 관련 -------------
                                 if (isNicknameAvailable ?: false || isChangedMajor) {
-                                    viewModel.updateNicknameAndMajor(nickname, major) // 룸DB에 저장
-                                    Firebase.firestore.collection("users").document(uid?:"").update(mapOf(
-                                        "nickname" to nickname,
-                                        "major" to major )
-                                    )
+                                    viewModel.updateNicknameAndMajor(nickname, major)
                                 }
                                 /* 뒤로 가기 로직 */
                                 navController.popBackStack()
