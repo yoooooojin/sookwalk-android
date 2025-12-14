@@ -23,38 +23,30 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AuthViewModel @Inject constructor
     (private val repository: AuthRepository): ViewModel() {
+
     // 화면 간 이동 시에도 저장되어야하는 정보
-    var loginId by mutableStateOf("")
-        private set
-    var password by mutableStateOf("")
-        private set
-    var nickname by mutableStateOf("")
-        private set
-    var major by mutableStateOf("")
-        private set
-    var email by mutableStateOf("")
-        private set
+    private val _loginId = MutableStateFlow("")
+    val loginId: StateFlow<String> = _loginId.asStateFlow()
+
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password.asStateFlow()
+
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email.asStateFlow()
+
 
 
     // 각 정보에 대한 세터
-    fun updateLoginId(loginId: String) {
-        this.loginId = loginId
+    fun updateLoginId(newLoginId: String) {
+        _loginId.value = newLoginId // 내부 MutableStateFlow 값 업데이트
     }
 
-    fun updatePassword(password: String) {
-        this.password = password
+    fun updatePassword(newPassword: String) {
+        _password.value = newPassword // 내부 MutableStateFlow 값 업데이트
     }
 
-    fun updateNickname(nickname: String) {
-        this.nickname = nickname
-    }
-
-    fun updateMajor(major: String) {
-        this.major = major
-    }
-
-    fun updateEmail(eamil: String) {
-        this.email = email
+    fun updateEmail(newEmail: String) {
+        _email.value = newEmail // 내부 MutableStateFlow 값 업데이트
     }
 
 
@@ -82,7 +74,7 @@ class AuthViewModel @Inject constructor
 
 
     // 회원 가입
-    fun insertNewAccount(
+    fun signUp(
         email: String,
         loginId: String,
         password: String,
@@ -90,12 +82,13 @@ class AuthViewModel @Inject constructor
         major: String
     ) {
         viewModelScope.launch {
-            repository.insertNewAccount(
+            repository.signUp(
                 email = email,
                 password = password,
                 nickname = nickname,
                 major = major,
-                loginId = loginId
+                loginId = loginId,
+                uid = ""
             )
         }
     }

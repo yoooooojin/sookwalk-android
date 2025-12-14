@@ -67,6 +67,10 @@ fun SignUpProfileScreen(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
+    // AuthViewModel의 StateFlow 값들을 수집
+    val emailValue by authViewModel.email.collectAsState()
+    val loginIdValue by authViewModel.loginId.collectAsState()
+    val passwordValue by authViewModel.password.collectAsState()
 
     var nickname by remember { mutableStateOf("") }
     val isNicknameAvailable by userViewModel.isNicknameAvailable.collectAsState() // 아이디 사용 가능 여부
@@ -100,10 +104,10 @@ fun SignUpProfileScreen(
     var departments by remember { mutableStateOf<List<String>>(emptyList()) }
 
 
+    val db = Firebase.firestore
 
     // 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
     LaunchedEffect(Unit) {
-        val db = Firebase.firestore
         val allMajors = mutableListOf<String>()
 
         try {
@@ -170,29 +174,31 @@ fun SignUpProfileScreen(
             ) {
                 Button(
                     onClick = {
-                        // 정보 저장
-                        authViewModel.updateNickname(finalNickname)
-                        authViewModel.updateMajor(major)
-
                         // Firestore에 회원 정보 저장
-                        // 지금까지 받은 정보를 엔티티로 변환
-                        val user: UserEntity = UserEntity(
-                            userId = 0, // PK 관련 로직 고민 필요
-                            major = authViewModel.major,
-                            email = authViewModel.email,
-                            nickname = authViewModel.nickname,
-                            loginId = authViewModel.loginId,
-                            profileImageUrl = ""
-                        )
 
-                        // FirebaseAuth로 계정 생성
                         // FirebaseAuth에 저장할 땐 이메일 + 비밀번호로
-                        authViewModel.insertNewAccount(
-                            authViewModel.email,
-                            authViewModel.loginId,
-                            authViewModel.password,
-                            finalNickname,
-                            major)
+                        authViewModel.signUp(
+                            email = emailValue,
+                            loginId =  loginIdValue,
+                            password = passwordValue,
+                            nickname = finalNickname,
+                            major = major)
+
+                        // 로그인아이디만 있는 컬렉션에 아이디 저장
+                        db.collection("loginIds").document(loginIdValue)
+                            .set(
+                                hashMapOf(
+                                    "loginId" to loginIdValue
+                                )
+                            )
+
+                        // 닉네임만 있는 컬렉션에 아이디 저장
+                        db.collection("nicknames").document(finalNickname)
+                            .set(
+                                hashMapOf(
+                                    "nicknmae" to finalNickname
+                                )
+                            )
 
                         // 로그인 페이지로 이동
                         navController.navigate("login"){

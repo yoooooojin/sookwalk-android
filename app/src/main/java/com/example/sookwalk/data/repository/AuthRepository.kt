@@ -39,6 +39,7 @@ class AuthRepository @Inject constructor(
             // 아이디가 존재하는지 먼저 확인
             if (idInFirestore.isEmpty) {
                 false
+                // 존재하면 이메일 가져오기
             } else {
                 val email = idInFirestore.documents.first().getString("email") ?: ""
                 // FirebaseAuth로 로그인 시도, 성공하면 user 객체 반환, 실패하면 예외 발생
@@ -58,13 +59,14 @@ class AuthRepository @Inject constructor(
         return user != null && !user.isAnonymous
     }
 
-    // 회원 가입
-    suspend fun insertNewAccount(
+    ////// 회원 가입 //////
+    suspend fun signUp(
         email: String,
         loginId: String,
         password: String,
         major: String,
-        nickname: String
+        nickname: String,
+        uid: String
     ) {
         // FirebaseAuth로 계정 생성
         // FirebaseAuth에 저장할 땐 이메일 + 비밀번호로
@@ -76,17 +78,19 @@ class AuthRepository @Inject constructor(
             val uid = authResult.user?.uid
 
             // 2. 계정 생성이 성공하면, Firestore에 정보 저장
+
+            // 먼저 엔티티 생성
             if (uid != null) {
                 val user = UserEntity(
                     email = email,
                     loginId = loginId,
                     major = major,
                     nickname = nickname,
-                    profileImageUrl = ""
-                    // id = uid (아직 추가 X)
+                    profileImageUrl = "",
+                    uid = uid
                 )
 
-                // Firestore에 사용자 UID를 문서 ID로 사용하여 정보 저장하고 기다림
+                // Firestore에 사용자 UID를 문서 ID로 사용
                 db.collection("users").document(uid)
                     .set(user)
                     .await()
@@ -114,7 +118,7 @@ class AuthRepository @Inject constructor(
         return try {
             Log.d("중복확인", "아이디 중복 확인 시도: '$loginId'")
             val result = db.collection("loginIds")
-                .document(loginId.trim())
+                .document(loginId.trim()) // 문서 이름으로 비교
                 //.whereEqualTo("loginId", loginId.trim()) // 공백 제거
                 .get()
                 .await()
