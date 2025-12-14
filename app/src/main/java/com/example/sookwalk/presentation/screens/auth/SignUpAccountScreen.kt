@@ -73,15 +73,9 @@ fun SignUpAccountScreen(
     // isLoginIdAvailable 상태가 변경될 때마다 메시지를 업데이트
     LaunchedEffect(isLoginIdAvailable) {
         when (isLoginIdAvailable) {
-            true -> {
-                isAvailableIdMsg = "사용 가능한 아이디입니다."
-            }
-            false -> {
-                isAvailableIdMsg = "이미 존재하는 아이디입니다."
-            }
-            null -> {
-                isAvailableIdMsg = "" // 초기 상태 또는 확인 전
-            }
+            true -> isAvailableIdMsg = "사용 가능한 아이디입니다."
+            false -> isAvailableIdMsg = "이미 존재하는 아이디입니다."
+            null -> isAvailableIdMsg = "" // 초기 상태 또는 확인 전
         }
     }
 
