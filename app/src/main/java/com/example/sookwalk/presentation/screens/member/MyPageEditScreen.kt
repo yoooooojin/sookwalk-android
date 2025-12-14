@@ -97,7 +97,6 @@ fun MyPageEditScreen(
                     profileImageUrlFromStorage = uri.toString()
                 }
                 .addOnFailureListener { exception ->
-                    // --- 여기가 바로 수정된 부분입니다 ---
                     // 실패 원인을 확인하여, '파일이 없는 경우'는 정상적인 케이스로 간주합니다.
                     if (exception is com.google.firebase.storage.StorageException &&
                         exception.errorCode == com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND
@@ -135,8 +134,17 @@ fun MyPageEditScreen(
     }
 
     var nickname by remember { mutableStateOf("") }
-    var isNicknameAvailable by remember { mutableStateOf<Boolean?>(null) }
+    val isNicknameAvailable by viewModel.isNicknameAvailable.collectAsState()
     var isAvailableNicknameMsg by remember { mutableStateOf("") }
+
+    // isNicknameAvailable 상태가 변경될 때마다 메시지를 업데이트
+    LaunchedEffect(isNicknameAvailable) {
+        when (isNicknameAvailable) {
+            true -> isAvailableNicknameMsg = "사용 가능한 닉네임입니다."
+            false -> isAvailableNicknameMsg = "이미 존재하는 닉네임입니다."
+            null -> isAvailableNicknameMsg = "" // 초기 상태 또는 확인 전
+        }
+    }
 
     var major by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
@@ -144,7 +152,7 @@ fun MyPageEditScreen(
     var isChangedMajor by remember { mutableStateOf(false) }
 
     var departments by remember { mutableStateOf<List<String>>(emptyList()) }
-// 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
+    // 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
     LaunchedEffect(Unit) {
         val db = Firebase.firestore
         val allMajors = mutableListOf<String>()
@@ -275,7 +283,7 @@ fun MyPageEditScreen(
                         ) {
                             Text(
                                 text = isAvailableNicknameMsg,
-                                color = Color.Red,
+                                color = if(isNicknameAvailable == true) MaterialTheme.colorScheme.tertiary else Color.Red,
                                 style = MaterialTheme.typography.labelSmall
                             )
 
@@ -283,16 +291,7 @@ fun MyPageEditScreen(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Button(
-                                onClick = {
-                                    viewModel.isNicknameAvailable(nickname)
-
-                                    if (viewModel.isAvailableNickname.value) {
-                                        isAvailableNicknameMsg = "사용 가능한 닉네임입니다."
-                                        isNicknameAvailable = true
-                                    } else {
-                                        isAvailableNicknameMsg = "이미 존재하는 닉네임입니다."
-                                    }
-                                },
+                                onClick = { viewModel.isNicknameAvailable(nickname) },
                                 shape = RoundedCornerShape(28),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.tertiary,

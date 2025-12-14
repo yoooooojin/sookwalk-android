@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,7 @@ fun SignUpProfileScreen(
 ) {
 
     var nickname by remember { mutableStateOf("") }
+    val isNicknameAvailable by userViewModel.isNicknameAvailable.collectAsState() // 아이디 사용 가능 여부
     var isAvailableNicknameMsg by remember { mutableStateOf("")}
 
     // 랜덤 닉네임 placeholder 생성
@@ -78,6 +80,16 @@ fun SignUpProfileScreen(
         "${adjectives.random()} ${nouns.random()}$number"
     }
 
+    // isNicknameAvailable 상태가 변경될 때마다 메시지를 업데이트
+    LaunchedEffect(isNicknameAvailable) {
+        when (isNicknameAvailable) {
+            true -> isAvailableNicknameMsg = "사용 가능한 닉네임입니다."
+            false -> isAvailableNicknameMsg = "이미 존재하는 닉네임입니다."
+            null -> isAvailableNicknameMsg = "" // 초기 상태 또는 확인 전
+        }
+    }
+
+
     // 닉네임을 입력받지 않았다면 placeholder 값을 사용
     val finalNickname =
         if (nickname.isBlank()) randomPlaceholder else nickname
@@ -86,6 +98,8 @@ fun SignUpProfileScreen(
     var expanded by remember { mutableStateOf(false) }
 
     var departments by remember { mutableStateOf<List<String>>(emptyList()) }
+
+
 
     // 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
     LaunchedEffect(Unit) {
@@ -246,7 +260,7 @@ fun SignUpProfileScreen(
                     ) {
                         Text(
                             text = isAvailableNicknameMsg,
-                            color = Color.Red,
+                            color = if(isNicknameAvailable == true) MaterialTheme.colorScheme.tertiary else Color.Red,
                             style = MaterialTheme.typography.labelSmall
                         )
 
@@ -255,12 +269,6 @@ fun SignUpProfileScreen(
                         Button(
                             onClick = {
                                 userViewModel.isNicknameAvailable(finalNickname)
-
-                                if (userViewModel.isAvailableNickname.value) {
-                                    isAvailableNicknameMsg = "사용 가능한 닉네임입니다."
-                                } else {
-                                    isAvailableNicknameMsg = "이미 존재하는 닉네임입니다."
-                                }
                             },
                             shape = RoundedCornerShape(28),
                             colors = ButtonDefaults.buttonColors(
