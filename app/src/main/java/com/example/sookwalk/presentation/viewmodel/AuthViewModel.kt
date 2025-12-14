@@ -63,7 +63,7 @@ class AuthViewModel @Inject constructor
     }
 
     // 로그인
-    var _isLoginSuccess = MutableStateFlow<Boolean>(false)
+    var _isLoginSuccess = MutableStateFlow<Boolean?>(null)
     val isLoginSuccess = _isLoginSuccess.asStateFlow()
     fun login(loginId: String, password: String) {
         viewModelScope.launch {
