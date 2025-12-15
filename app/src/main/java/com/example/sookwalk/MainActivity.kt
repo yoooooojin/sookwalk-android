@@ -32,36 +32,28 @@ class MainActivity : ComponentActivity() {
 
         MapsInitializer.initialize(applicationContext)
 
+        val apiKey = BuildConfig.PLACES_API_KEY
+
+        if (apiKey.isEmpty() || apiKey == "DEFAULT_API_KEY") {
+            Log.e("Places test", "No api key")
+            finish()
+            return
+        }
+
+        if (!Places.isInitialized()) {
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
+        }
+        val placesClient = Places.createClient(this)
+
         enableEdgeToEdge()
         setContent {
             val themeVM: ThemeViewModel = hiltViewModel()
             val isDark by themeVM.isDark.collectAsStateWithLifecycle()
             val navController = rememberNavController()
 
-            // Define a variable to hold the Places API key.
-            val apiKey = BuildConfig.PLACES_API_KEY
-
-            // Log an error if apiKey is not set.
-            if (apiKey.isEmpty() || apiKey == "DEFAULT_API_KEY") {
-                Log.e("Places test", "No api key")
-                finish()
-
-            }
-
-            // Initialize the SDK
-            Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
-
-            // Create a new PlacesClient instance
-            val placesClient = Places.createClient(this)
-
-
-            val viewModel: PlacesViewModel = hiltViewModel()
-            var showSheet by remember { mutableStateOf(true) }
-
             NotificationHelper.createNotificationChannel(this)
             askNotificationPermission()
 
-            // 알림 클릭 시 실행할 네비게이션 정보
             val navigationFromNotification = intent?.getStringExtra("navigation") ?: null
 
             SookWalkTheme (
