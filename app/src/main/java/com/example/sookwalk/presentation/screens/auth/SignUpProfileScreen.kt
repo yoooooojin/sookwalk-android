@@ -190,61 +190,6 @@ fun SignUpProfileScreen(
                 },
                 true
             )
-            /*
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                Button(
-                    onClick = {
-                        // Firestore에 회원 정보 저장
-
-                        // FirebaseAuth에 저장할 땐 이메일 + 비밀번호로
-                        authViewModel.signUp(
-                            email = emailValue,
-                            loginId =  loginIdValue,
-                            password = passwordValue,
-                            nickname = finalNickname,
-                            major = major)
-
-                        // 로그인아이디만 있는 컬렉션에 아이디 저장
-                        db.collection("loginIds").document(loginIdValue)
-                            .set(
-                                hashMapOf(
-                                    "loginId" to loginIdValue
-                                )
-                            )
-
-                        // 닉네임만 있는 컬렉션에 아이디 저장
-                        db.collection("nicknames").document(finalNickname)
-                            .set(
-                                hashMapOf(
-                                    "nicknmae" to finalNickname
-                                )
-                            )
-
-                        // 로그인 페이지로 이동
-                        navController.navigate("login"){
-                            // 이전 페이지 방문 기록 삭제
-                            popUpTo(navController.graph.startDestinationId){
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    shape = RoundedCornerShape(28),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("회원 가입", style = MaterialTheme.typography.displaySmall)
-                }
-            }*/
         }
     ) { padding ->
         Box(

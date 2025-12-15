@@ -162,34 +162,6 @@ fun SignUpAccountScreen(
                 },
                 moveNextEnabled
             )
-            /*
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                Button(
-                    onClick = {
-                        // 입력 정보 viewModel에 저장
-                        viewModel.updateLoginId(loginId)
-                        viewModel.updatePassword(password)
-                        viewModel.updateEmail(email)
-                        // 회원가입 - 프로필 설정 페이지로 이동
-                        navController.navigate(Routes.PROFILE)
-                    },
-                    enabled = moveNextEnabled,
-                    shape = RoundedCornerShape(28),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("다음", style = MaterialTheme.typography.displaySmall)
-                }
-            }*/
         }
     ) { padding ->
         Box(
