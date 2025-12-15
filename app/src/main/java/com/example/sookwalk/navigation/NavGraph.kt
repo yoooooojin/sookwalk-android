@@ -65,16 +65,15 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
         ////// 첫 화면 //////
 
         composable(Routes.LOGIN) {
-             if (isLoggedIn) {
-                 MyPageScreen(userViewModel, navController)
-                 /* HomeScreen(goalViewModel, stepViewModel, navController,
-                     onBack = { navController.popBackStack() },
-                     onAlarmClick = {navController.navigate(Routes.NOTIFICATION)},
-                     onMenuClick = {/*드로어 열림/닫힘 제어를 받아올 함수*/},
-                     onRankingBtnClick = {navController.navigate(Routes.RANK)}
-                 ) */
-             } else
-            LoginScreen(authViewModel, navController)
+            if (isLoggedIn) {
+                HomeScreen(goalViewModel, stepViewModel, navController,
+                    onBack = { navController.popBackStack() },
+                    onAlarmClick = {navController.navigate(Routes.NOTIFICATION)},
+                    onMenuClick = {/*드로어 열림/닫힘 제어를 받아올 함수*/},
+                    onRankingBtnClick = {navController.navigate(Routes.RANK)}
+                )
+            } else
+                LoginScreen(authViewModel, navController)
         }
 
 
@@ -152,7 +151,7 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                 onBack = { navController.popBackStack() },
                 onAlarmClick = {navController.navigate(Routes.NOTIFICATION)},
                 onMenuClick = {/*드로어 열림/닫힘 제어를 받아올 함수*/}
-                )
+            )
         }
 
         // 지도
