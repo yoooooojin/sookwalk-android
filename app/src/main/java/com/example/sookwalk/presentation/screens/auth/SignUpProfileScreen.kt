@@ -51,6 +51,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sookwalk.data.local.entity.user.UserEntity
+import com.example.sookwalk.navigation.Routes
+import com.example.sookwalk.presentation.components.SignUpBottomControlBar
 import com.example.sookwalk.presentation.viewmodel.AuthViewModel
 import com.example.sookwalk.presentation.viewmodel.UserViewModel
 import com.google.firebase.Firebase
@@ -166,6 +168,29 @@ fun SignUpProfileScreen(
         },
 
         bottomBar = {
+            SignUpBottomControlBar(
+                "SignUpProfile",
+                {
+                    // FirebaseAuth로 저장할 땐 이메일 + 비밀번호로
+                    authViewModel.signUp(
+                        email = emailValue,
+                        loginId =  loginIdValue,
+                        password = passwordValue,
+                        nickname = finalNickname,
+                        major = major
+                    )
+
+                    navController.navigate(Routes.LOGIN){
+                    // 이전 페이지 방문 기록 삭제
+                    popUpTo(navController.graph.startDestinationId){
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                    }
+                },
+                true
+            )
+            /*
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -219,7 +244,7 @@ fun SignUpProfileScreen(
                 ) {
                     Text("회원 가입", style = MaterialTheme.typography.displaySmall)
                 }
-            }
+            }*/
         }
     ) { padding ->
         Box(

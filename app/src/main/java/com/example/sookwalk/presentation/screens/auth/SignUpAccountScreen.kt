@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sookwalk.navigation.Routes
+import com.example.sookwalk.presentation.components.SignUpBottomControlBar
 import com.example.sookwalk.presentation.viewmodel.AuthViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -149,6 +150,19 @@ fun SignUpAccountScreen(
         },
 
         bottomBar = {
+            SignUpBottomControlBar(
+                "SignUpAccount",
+                {
+                    // 입력 정보 viewModel에 저장
+                    viewModel.updateLoginId(loginId)
+                    viewModel.updatePassword(password)
+                    viewModel.updateEmail(email)
+                    // 회원가입 - 프로필 설정 페이지로 이동
+                    navController.navigate(Routes.PROFILE)
+                },
+                moveNextEnabled
+            )
+            /*
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,7 +189,7 @@ fun SignUpAccountScreen(
                 ) {
                     Text("다음", style = MaterialTheme.typography.displaySmall)
                 }
-            }
+            }*/
         }
     ) { padding ->
         Box(

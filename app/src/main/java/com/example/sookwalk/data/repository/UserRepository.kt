@@ -27,7 +27,7 @@ class UserRepository @Inject constructor(
         return try {
             Log.d("중복확인", "닉네임 중복 확인 시도: '$nickname'")
             val result = db.collection("nicknames")
-                .document(nickname.trim()) // 문서 이름으로 비교
+                .document(nickname) // 문서 이름으로 비교
                 .get()
                 .await()
             Log.d("중복확인", "닉네임 중복 확인 시도2: '$nickname'")

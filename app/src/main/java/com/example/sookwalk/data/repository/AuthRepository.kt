@@ -96,6 +96,22 @@ class AuthRepository @Inject constructor(
                     .await()
                 Log.d("SignUp", "Firestore에 회원정보 저장 성공")
 
+                // 로그인 아이디만 있는 컬렉션에 아이디 저장
+                db.collection("loginIds").document(loginId)
+                    .set(
+                        hashMapOf(
+                            "loginId" to loginId
+                        )
+                    )
+
+                // 닉네임만 있는 컬렉션에 아이디 저장
+                db.collection("nicknames").document(nickname)
+                    .set(
+                        hashMapOf(
+                            "nickname" to nickname
+                        )
+                    )
+
                 // 로컬 DB에 저장
                 // Firestore까지 성공해야 로컬에도 저장
                 dao.insert(user)
