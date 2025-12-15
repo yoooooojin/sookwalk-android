@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.sookwalk.data.local.dao.UserDao
 import com.example.sookwalk.data.local.entity.user.UserEntity
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import jakarta.inject.Inject
@@ -23,19 +24,23 @@ class AuthRepository @Inject constructor(
     // FirebaseAuth로 로그인
     val auth = FirebaseAuth.getInstance()
 
+    // DB
+    val db = Firebase.firestore("sookwalk")
+
     // 로그인 시도
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
     suspend fun login(loginId: String, password: String): Boolean {
         return try {
-            val idInFirestore = Firebase.firestore.collection("users")
+            val idInFirestore = db.collection("users")
                 .whereEqualTo("loginId", loginId.trim()) // 공백 제거
                 .get()
                 .await()
 
             // 아이디가 존재하는지 먼저 확인
             if (idInFirestore.isEmpty) {
-                return false
+                false
+                // 존재하면 이메일 가져오기
             } else {
                 val email = idInFirestore.documents.first().getString("email") ?: ""
                 // FirebaseAuth로 로그인 시도, 성공하면 user 객체 반환, 실패하면 예외 발생
@@ -55,59 +60,126 @@ class AuthRepository @Inject constructor(
         return user != null && !user.isAnonymous
     }
 
-    // 회원 가입
-    suspend fun insertNewAccount(
+    ////// 회원 가입 //////
+    suspend fun signUp(
         email: String,
         loginId: String,
         password: String,
         major: String,
-        nickname: String
+        nickname: String,
+        uid: String
     ) {
-        val user = UserEntity(
-            email = email,
-            loginId = loginId,
-            major = major,
-            nickname = nickname,
-            profileImageUrl = ""
-        )
-
+        // FirebaseAuth로 계정 생성
+        // FirebaseAuth에 저장할 땐 이메일 + 비밀번호로
         try {
-            // 1. Firebase Auth 계정 생성 (await를 써서 다 될 때까지 기다림)
-            auth.createUserWithEmailAndPassword(email, password).await()
-            Log.d("SignUp", "Firebase Auth 계정 생성 성공")
+            val currentUser = auth.currentUser
 
-            // 2. Firestore에 정보 저장 (계정 생성이 성공했을 때만 실행됨)
-            Firebase.firestore.collection("users")
-                .add(user)
-                .await() // 저장 완료될 때까지 대기
-            Log.d("SignUp", "Firestore 저장 성공")
+            if (currentUser == null || !currentUser.isAnonymous) {
+                // 익명 계정이 없거나 이미 정규 계정이면 에러 처리
+                throw IllegalStateException("회원가입은 익명 로그인 상태에서만 진행 가능합니다.")
+            }
 
-            // 3. 로컬 DB 저장 (마지막에 저장)
-            dao.insert(user)
-            Log.d("SignUp", "Room DB 저장 성공")
+            val credential = EmailAuthProvider.getCredential(email, password)
+            // 1. FirebaseAuth로 계정 생성하고 작업이 끝날 때까지 기다림
+            val authResult = currentUser.linkWithCredential(credential).await()
+            Log.d("SignUp", "FirebaseAuth 계정 생성 성공: ${authResult.user?.email}")
+
+            // 기존 익명 UID 그대로 사용
+            val uid = authResult.user!!.uid
+
+            // 2. 계정 생성이 성공하면, Firestore에 정보 저장
+
+            // 먼저 엔티티 생성
+            if (uid != null) {
+                val user = UserEntity(
+                    email = email,
+                    loginId = loginId,
+                    major = major,
+                    nickname = nickname,
+                    profileImageUrl = "",
+                    uid = uid
+                )
+
+                // Firestore에 사용자 UID를 문서 ID로 사용
+                db.collection("users").document(uid)
+                    .set(user)
+                    .await()
+                Log.d("SignUp", "Firestore에 회원정보 저장 성공")
+
+                // 로그인 아이디만 있는 컬렉션에 아이디 저장
+                db.collection("loginIds").document(loginId)
+                    .set(
+                        hashMapOf(
+                            "loginId" to loginId
+                        )
+                    )
+
+                // 닉네임만 있는 컬렉션에 아이디 저장
+                db.collection("nicknames").document(nickname)
+                    .set(
+                        hashMapOf(
+                            "nickname" to nickname
+                        )
+                    )
+
+                // 이메일만 있는 컬렉션에 이메일 저장
+                db.collection("emails").document(email)
+                    .set(
+                        hashMapOf(
+                            "email" to email
+                        )
+                    )
+
+
+                // 로컬 DB에 저장
+                // Firestore까지 성공해야 로컬에도 저장
+                dao.insert(user)
+                Log.d("SignUp", "로컬 DB에 회원정보 저장 성공")
+
+            } else {
+                // 이 경우는 거의 없지만, 방어 코드로 추가
+                throw IllegalStateException("FirebaseAuth 계정 생성 후 UID를 받지 못했습니다.")
+            }
 
         } catch (e: Exception) {
-            // 회원가입 실패 시 로그 출력
             Log.e("SignUp", "회원가입 실패: ${e.message}")
-            throw e // 뷰모델로 에러를 던져서 UI에서 알림을 띄우게 할 수도 있음
+            // 실패 사실을 호출한 쪽(ViewModel)에 알리기 위해 예외를 다시 던짐
+            throw e
         }
     }
 
     // 아이디 중복 여부 확인
-    suspend fun isLoginIdAvailable(loginId: String): Boolean {        // try-catch 구문으로 네트워크 및 권한 오류로부터 앱을 보호
+    suspend fun isLoginIdAvailable(loginId: String): Boolean {
         return try {
-            val result = Firebase.firestore.collection("users")
-                .whereEqualTo("loginId", loginId.trim())
+            Log.d("중복확인", "아이디 중복 확인 시도: '$loginId'")
+            val result = db.collection("loginIds")
+                .document(loginId.trim()) // 문서 이름으로 비교
+                //.whereEqualTo("loginId", loginId.trim()) // 공백 제거
                 .get()
                 .await()
+            Log.d("중복확인", "아이디 중복 확인 시도2: '$loginId'")
+            !result.exists() // 비어있으면 (중복 X 아이디면) 사용 가능
+        }catch(e: Exception){
+            Log.e("loginId", "아이디 중복 확인 실패", e)
+            throw e
+        }
+    }
 
-            // 문서를 찾지 못하면 true(사용 가능) 반환
-            result.isEmpty
-        } catch (e: Exception) {
-            // Firestore 접근에 실패하면 (네트워크, 권한 문제 등)
-            // 안전을 위해 '사용 불가(false)'로 처리하고 에러 로그를 남긴다.
-            Log.e("IdCheck", "아이디 중복 체크 실패: ${e.message}")
-            false
+
+    // 이메일 중복 여부 확인
+    suspend fun isEmailAvailable(email: String): Boolean {
+        return try {
+            Log.d("중복확인", "이메일 중복 확인 시도: '$email'")
+            val result = db.collection("emails")
+                .document(email.trim()) // 문서 이름으로 비교
+                //.whereEqualTo("loginId", loginId.trim()) // 공백 제거
+                .get()
+                .await()
+            Log.d("중복확인", "이메일 중복 확인 시도2: '$email'")
+            !result.exists() // 비어있으면 (중복 X 아이디면) 사용 가능
+        }catch(e: Exception){
+            Log.e("email", "이메일 중복 확인 실패", e)
+            throw e
         }
     }
 }
