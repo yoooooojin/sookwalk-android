@@ -62,7 +62,7 @@ fun AddToCategoryDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable { showCreateDialog = true } // [수정] 클릭 시 상태 변경 -> AddFavoriteDialog 오픈
+                            .clickable { showCreateDialog = true }
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -73,13 +73,13 @@ fun AddToCategoryDialog(
                             Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                         }
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("새 폴더 만들기", color = Color.Black, fontWeight = FontWeight.Medium)
+                        Text("새 즐겨찾기 만들기", color = Color.Black, fontWeight = FontWeight.Medium)
                     }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     if (categories.isEmpty()) {
-                        Text("생성된 폴더가 없습니다.", color = Color.Gray, modifier = Modifier.padding(vertical = 12.dp))
+                        Text("즐겨찾기가 없습니다.", color = Color.Gray, modifier = Modifier.padding(vertical = 12.dp))
                     } else {
                         LazyColumn {
                             items(categories) { category ->
@@ -102,7 +102,6 @@ fun AddToCategoryDialog(
                                         colors = CheckboxDefaults.colors(checkedColor = Color(0xFF004D40))
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    // 색상 점
                                     Box(Modifier.size(12.dp).background(Color(category.iconColor), CircleShape))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = category.name, fontSize = 16.sp)
