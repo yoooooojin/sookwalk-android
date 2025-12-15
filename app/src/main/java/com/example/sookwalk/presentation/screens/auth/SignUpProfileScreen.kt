@@ -54,6 +54,7 @@ import com.example.sookwalk.data.local.entity.user.UserEntity
 import com.example.sookwalk.navigation.Routes
 import com.example.sookwalk.presentation.components.SignUpBottomControlBar
 import com.example.sookwalk.presentation.viewmodel.AuthViewModel
+import com.example.sookwalk.presentation.viewmodel.MajorViewModel
 import com.example.sookwalk.presentation.viewmodel.UserViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -67,6 +68,7 @@ import kotlinx.coroutines.tasks.await
 fun SignUpProfileScreen(
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
+    majorViewModel: MajorViewModel,
     navController: NavController
 ) {
     // AuthViewModel의 StateFlow 값들을 수집
@@ -103,38 +105,12 @@ fun SignUpProfileScreen(
     var major by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
-    var departments by remember { mutableStateOf<List<String>>(emptyList()) }
-
-
-    val db = Firebase.firestore
+    // MajorViewModel의 상태를 수집
+    val departments by majorViewModel.departments.collectAsState()
 
     // 화면이 처음 생성될 때 Firestore에서 모든 전공 목록을 가져옴
     LaunchedEffect(Unit) {
-        val allMajors = mutableListOf<String>()
-
-        try {
-            // 1. 'collages' 컬렉션에 있는 모든 단과대학 문서들을 가져옴
-            val colleges = db.collection("collages").get().await()
-
-            // 2. 각 단과대학 문서에 대해 반복
-            for (collegeDoc in colleges.documents) {
-                // 3. 해당 단과대학의 'majors' 하위 컬렉션에 있는 모든 세부 전공들을 가져옴
-                val majors = db.collection("collages").document(collegeDoc.id)
-                    .collection("majors").get().await()
-
-                // 4. 가져온 세부 전공들의 이름을 리스트에 추가
-                for (majorDoc in majors.documents) {
-                    majorDoc.getString("major_name")?.let { majorName ->
-                        allMajors.add(majorName)
-                    }
-                }
-            }
-
-            // 5. 완성된 전체 전공 리스트로 상태 업데이트
-            departments = allMajors.sorted() // 가나다순으로 정렬
-        } catch (e: Exception) {
-            Log.e("Firestore", "전공 목록을 불러오는 데 실패했습니다.", e)
-        }
+        majorViewModel.getMajors()
     }
 
     // 입력된 텍스트가 포함된 전공만 필터링
