@@ -35,4 +35,13 @@ interface FavoriteDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlace(place: SavedPlaceEntity): Long
+
+    @Query("SELECT * FROM favorite_categories WHERE id = :id")
+    suspend fun getCategoryById(id: Long): FavoriteCategoryEntity?
+
+    @Query("SELECT * FROM favorite_categories WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getCategoryByRemoteId(remoteId: String): FavoriteCategoryEntity?
+
+    @Query("SELECT * FROM saved_places WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getPlaceByRemoteId(remoteId: String): SavedPlaceEntity?
 }
