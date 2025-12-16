@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sookwalk.data.local.entity.notification.NotificationEntity
 import com.example.sookwalk.data.repository.NotificationRepository
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,15 +20,21 @@ class NotificationViewModel @Inject constructor(
             viewModelScope, SharingStarted.Lazily, emptyList()
         )
 
-    fun markAsRead(id: Int){
+    fun markAllAsRead(){
         viewModelScope.launch {
-            repository.markAsRead(id)
+            repository.markAllAsRead()
         }
     }
 
     fun clearAll(){
         viewModelScope.launch{
             repository.clearAll()
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            repository.preloadIfEmpty()
         }
     }
 }
