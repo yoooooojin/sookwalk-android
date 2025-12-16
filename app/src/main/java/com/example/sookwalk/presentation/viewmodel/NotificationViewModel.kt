@@ -16,19 +16,25 @@ class NotificationViewModel @Inject constructor(
     private val repository: NotificationRepository
 ): ViewModel(){
     val notificationList: StateFlow<List<NotificationEntity>> =
-        repository.notifications.stateIn(
+        repository.observeNotifications().stateIn(
             viewModelScope, SharingStarted.Lazily, emptyList()
         )
 
-    fun markAsRead(id: Int){
+    fun markAllAsRead(){
         viewModelScope.launch {
-            repository.markAsRead(id)
+            repository.markAllAsRead()
         }
     }
 
     fun clearAll(){
         viewModelScope.launch{
             repository.clearAll()
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            repository.preloadIfEmpty()
         }
     }
 }

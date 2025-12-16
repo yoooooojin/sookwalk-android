@@ -39,7 +39,7 @@ fun MainScreen() {
     Scaffold (
         topBar = {
             if (showRootBars) {
-                TopBar(currentRoute)
+                //TopBar(currentRoute)
             }
         },
         bottomBar = {

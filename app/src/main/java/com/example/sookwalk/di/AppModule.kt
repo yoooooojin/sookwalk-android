@@ -12,9 +12,15 @@ import com.example.sookwalk.data.local.dao.UserDao
 import com.example.sookwalk.data.repository.GoalRepository
 import com.example.sookwalk.data.repository.MapRepository
 import com.example.sookwalk.data.repository.NotificationRepository
+import com.example.sookwalk.data.repository.StepRepository
 import com.example.sookwalk.data.repository.UserRepository
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.firebase.Firebase
+import com.google.firebase.app
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +34,17 @@ import kotlin.jvm.java
 @InstallIn(SingletonComponent::class) // 앱 전역에서 사용할 수 있게 함
 object AppModule {
 
+    @Provides
+    @Singleton
+    fun provideFirestore(): FirebaseFirestore =
+        FirebaseFirestore.getInstance(Firebase.app, "sookwalk")
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
     // Room DB 인스턴스 제공
     @Provides
     @Singleton
@@ -40,8 +57,6 @@ object AppModule {
         ).build() // DB 생성
     }
 
-
-    // 객체 간 연결 규칙을 명시한다
     @Provides
     fun provideUserDao(database: AppDatabase): UserDao {
         return database.userDao()
@@ -71,14 +86,27 @@ object AppModule {
     }
 
     @Provides
-    fun provideGoalRepository(goalDao: GoalDao): GoalRepository {
-        return GoalRepository(goalDao)
+    fun provideGoalRepository(
+        goalDao: GoalDao,
+        db: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): GoalRepository {
+        return GoalRepository(goalDao, db, auth)
     }
 
     // Step
     @Provides
     fun provideStepDao(appDatabase: AppDatabase): StepDao {
         return appDatabase.stepDao()
+    }
+
+    @Provides
+    fun provideStepRepository(
+        stepDao: StepDao,
+        db: FirebaseFirestore,
+        @ApplicationContext context: Context
+    ): StepRepository {
+        return StepRepository(stepDao, db, context)
     }
 
     // --- Map & Places 관련 추가 ---

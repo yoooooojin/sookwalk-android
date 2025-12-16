@@ -17,12 +17,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sookwalk.R
 import com.example.sookwalk.data.local.entity.notification.NotificationEntity
@@ -31,7 +34,6 @@ import com.example.sookwalk.presentation.components.TopBar
 import com.example.sookwalk.presentation.viewmodel.NotificationViewModel
 import com.example.sookwalk.ui.theme.Grey20
 import com.example.sookwalk.utils.notification.DateUtils.formatTimestamp
-import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,16 @@ fun AlarmScreen(
     onAlarmClick: () -> Unit,
     onMenuClick: () -> Unit // 드로어 열림/닫힘 제어를 받아올 함수
 ){
-    val notificationList = notificationViewModel.notificationList.collectAsState()
+    val notificationList by notificationViewModel.notificationList.collectAsStateWithLifecycle()
+    val hadUnread = remember(notificationList) { notificationList.any { !it.isRead } }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (hadUnread) {
+                notificationViewModel.markAllAsRead()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -60,7 +71,7 @@ fun AlarmScreen(
                .padding(innerPadding)
        ){
            LazyColumn(){
-                items(notificationList.value){ notificationEntity ->
+                items(notificationList){ notificationEntity ->
                     AlarmCard(notificationEntity)
                 }
            }
@@ -68,7 +79,7 @@ fun AlarmScreen(
     }
 }
 
-data class Alarm (val title: String, val description: String, val date: LocalDateTime, var isRead: Boolean)
+
 
 @Composable
 fun AlarmCard(notificationEntity: NotificationEntity){

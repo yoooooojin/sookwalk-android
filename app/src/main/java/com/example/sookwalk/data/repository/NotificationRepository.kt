@@ -2,6 +2,8 @@ package com.example.sookwalk.data.repository
 
 import com.example.sookwalk.data.local.dao.NotificationDao
 import com.example.sookwalk.data.local.entity.notification.NotificationEntity
+import com.example.sookwalk.data.local.entity.notification.NotificationSampleData
+import com.example.sookwalk.data.local.entity.notification.NotificationSampleData.samples
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -10,11 +12,19 @@ class NotificationRepository @Inject constructor(
 ) {
     val notifications: Flow<List<NotificationEntity>> = dao.getAll()
 
+    fun observeNotifications(): Flow<List<NotificationEntity>> =
+        dao.getAll()
+
+    suspend fun preloadIfEmpty() {
+        if (dao.count() == 0) {
+            dao.insertAll(NotificationSampleData.samples()) } // or insertAll 만들기
+    }
+
     suspend fun saveNotification(notification: NotificationEntity): Long {
         return dao.insert(notification)
     }
 
-    suspend fun markAsRead(notificationId: Int) = dao.markAsRead(notificationId)
+    suspend fun markAllAsRead() = dao.markAllAsRead()
 
     suspend fun clearAll() = dao.clearAll()
 }
