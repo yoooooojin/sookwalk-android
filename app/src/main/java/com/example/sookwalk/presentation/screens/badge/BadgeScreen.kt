@@ -78,31 +78,31 @@ fun BadgeScreen(
         BadgeInfo(
             "워킹 마스터",
             "레벨 $stepLevel/5",
-            R.drawable.character_01,
+            R.drawable.ic_walking,
             "\uD83C\uDFC3\u200D♂\uFE0F ${totalSteps}보 걸었습니다!",
             stepDate),
         BadgeInfo(
             "챌린지 고수",
             "레벨 $challengeLevel/5",
-            R.drawable.character_01,
+            R.drawable.ic_challenge,
             "\uD83D\uDD25 ${totalChallenges}개의 챌린지를 완수했습니다!",
             challengeDate),
         BadgeInfo(
             "추억 수집가",
             "레벨 $placeLevel/5",
-            R.drawable.character_01,
+            R.drawable.ic_photos,
             "\uD83D\uDCF7 ${totalPlaces}개의 장소를 저장했습니다!",
             placeDate),
         BadgeInfo(
             "챔피언 워커",
             "레벨 $rankLevel/5",
-            R.drawable.character_01,
+            R.drawable.ic_champion,
             "\uD83D\uDC51 단과대 별 대항전에서\n${totalRanks}번 상위권에 들었습니다!",
             rankDate),
         BadgeInfo(
             "의리왕",
             "레벨 1/5",
-            R.drawable.character_01,
+            R.drawable.ic_handshaking,
             "\uD83E\uDD70 숙워크와 함께한지 50일 되었습니다!",
             null),
         BadgeInfo(null, null, null, "", null),
@@ -338,7 +338,7 @@ fun BestBadgeCard(badge: BadgeInfo?) {
                         contentAlignment = Alignment.TopEnd
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.character_01),
+                            painter = painterResource(id = imageRes),
                             contentDescription = null,
                             modifier = Modifier.size(140.dp)
                         )
