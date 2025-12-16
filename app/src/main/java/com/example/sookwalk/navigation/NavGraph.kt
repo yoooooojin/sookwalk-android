@@ -24,6 +24,7 @@ import com.example.sookwalk.presentation.screens.goal.AddGoalScreen
 import com.example.sookwalk.presentation.screens.goal.GoalScreen
 import com.example.sookwalk.presentation.screens.home.AlarmScreen
 import com.example.sookwalk.presentation.screens.home.HomeScreen
+// import com.example.sookwalk.presentation.screens.home.HomeScreen
 import com.example.sookwalk.presentation.screens.home.RankingScreen
 import com.example.sookwalk.presentation.screens.map.MapScreen
 import com.example.sookwalk.presentation.screens.member.MyPageEditScreen
@@ -76,17 +77,21 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                 navController = navController,
                 scope = scope
             ) {
-            if (isLoggedIn) {
-                HomeScreen(goalViewModel, stepViewModel, navController,
-                    onBack = { navController.popBackStack() },
-                    onAlarmClick = {navController.navigate(Routes.NOTIFICATION)},
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    }},
-                    onRankingBtnClick = {navController.navigate(Routes.RANK)}
-                )
-            } else
-                LoginScreen(authViewModel, navController)
+                if (isLoggedIn) {
+                    HomeScreen(
+                        goalViewModel, stepViewModel, navController,
+                        onBack = { navController.popBackStack() },
+                        onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
+                        onMenuClick = {
+                            scope.launch {
+                                if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                            }
+                        },
+                        onRankingBtnClick = { navController.navigate(Routes.RANK) },
+                        onGoToGoalsClick = { navController.navigate(Routes.GOALS) }
+                    )
+                } else
+                    LoginScreen(authViewModel, navController)
             }
         }
 
@@ -174,7 +179,9 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     onMenuClick = { scope.launch {
                         if (drawerState.isClosed) drawerState.open() else drawerState.close()
                     } },
-                    onRankingBtnClick = { navController.navigate(Routes.RANK) }
+                    onRankingBtnClick = { navController.navigate(Routes.RANK) },
+                    onGoToGoalsClick = { navController.navigate(Routes.GOALS) }
+
                 )
             }
         }
@@ -188,12 +195,16 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                 scope = scope
             ) {
                 GoalScreen(
-                    goalViewModel, navController,
+                    viewModel = goalViewModel,
+                    stepViewModel = stepViewModel,
+                    navController = navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } },
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    },
                     onAddGoalClick = { dateString ->
                         navController.navigate("add_goal_screen?date=$dateString")
                     }

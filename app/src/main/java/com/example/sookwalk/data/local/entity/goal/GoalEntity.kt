@@ -7,21 +7,19 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "goals")
 data class GoalEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Int = 0, // 로컬 관리용 ID (Room)
+
+    val remoteId: String = "", // 파이어베이스 문서 ID (동기화용)
 
     @ColumnInfo(name = "title")
     val title: String,
 
-    // 목표 걸음 수
     val targetSteps: Int,
-    // 현재까지 채운 걸음 수
     val currentSteps: Int,
 
-    // yyyy-MM-dd
     @ColumnInfo(name = "startDate")
     val startDate: String,
 
-    // 목표 기한
     @ColumnInfo(name = "endDate")
     val endDate: String,
 
