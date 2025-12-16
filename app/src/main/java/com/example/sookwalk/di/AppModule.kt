@@ -32,7 +32,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore =
-        FirebaseFirestore.getInstance()
+        FirebaseFirestore.getInstance("sookwalk")
 
     // Room DB 인스턴스 제공
     @Provides
