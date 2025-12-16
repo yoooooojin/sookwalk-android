@@ -97,7 +97,7 @@ fun BadgeScreen(
             "챔피언 워커",
             "레벨 $rankLevel/5",
             R.drawable.character_01,
-            "\uD83D\uDC51 주차별 랭킹전에서 ${totalRanks}번 상위권에 들었습니다!",
+            "\uD83D\uDC51 대항전에서 ${totalRanks}번 상위권에 들었습니다!",
             rankDate),
         BadgeInfo(
             "의리왕",

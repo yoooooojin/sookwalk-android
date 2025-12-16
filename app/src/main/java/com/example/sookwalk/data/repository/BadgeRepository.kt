@@ -93,7 +93,8 @@ class BadgeRepository @Inject constructor(
         val date = getTotalSteps().second
         val thresholds = getLevelThresholds("walkingMaster") // Firestore 배열 필드명
         val level = calculateLevel(steps, thresholds)
-        return Triple(steps, level, date)
+        val achievedThreshold = if (level > 0) thresholds[level - 1].toInt() else 0
+        return Triple(achievedThreshold, level, date)
     }
 
     // 장소 수도 같은 방식으로 추가
@@ -102,7 +103,8 @@ class BadgeRepository @Inject constructor(
         val date = getTotalPlaces().second
         val thresholds = getLevelThresholds("memoryCollector")
         val level = calculateLevel(places, thresholds)
-        return Triple(places, level, date)
+        val achievedThreshold = if (level > 0) thresholds[level - 1].toInt() else 0
+        return Triple(achievedThreshold, level, date)
     }
 
     // 랭크 수도 같은 방식으로 추가
@@ -111,7 +113,8 @@ class BadgeRepository @Inject constructor(
         val date = getTotalRanks().second
         val thresholds = getLevelThresholds("championWalker")
         val level = calculateLevel(ranks, thresholds)
-        return Triple(ranks, level, date)
+        val achievedThreshold = if (level > 0) thresholds[level - 1].toInt() else 0
+        return Triple(achievedThreshold, level, date)
     }
 
     // 챌린지 수도 같은 방식으로 추가
@@ -120,7 +123,8 @@ class BadgeRepository @Inject constructor(
         val date = getTotalRanks().second
         val thresholds = getLevelThresholds("challengePro")
         val level = calculateLevel(challenges, thresholds)
-        return Triple(challenges, level, date)
+        val achievedThreshold = if (level > 0) thresholds[level - 1].toInt() else 0
+        return Triple(achievedThreshold, level, date)
     }
 
 }
