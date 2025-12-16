@@ -23,7 +23,7 @@ class NotificationRepository @Inject constructor(
         return dao.insert(notification)
     }
 
-    suspend fun markAsRead(notificationId: Int) = dao.markAsRead(notificationId)
+    suspend fun markAllAsRead() = dao.markAllAsRead()
 
     suspend fun clearAll() = dao.clearAll()
 }
