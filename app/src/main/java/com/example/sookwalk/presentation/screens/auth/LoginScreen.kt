@@ -24,13 +24,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +61,24 @@ fun LoginScreen(
 ) {
 
     var loginAvailableMsg by remember { mutableStateOf("") }
+    val isLoginSuccess by viewModel.isLoginSuccess.collectAsState() // 로그인 가능 여부
+
+    LaunchedEffect(isLoginSuccess) {
+        if (isLoginSuccess == true) {
+            // 로그인 성공 시
+            navController.navigate(Routes.HOME) {
+                // 로그인 후 뒤로 가기 시 로그인 화면으로 돌아오지 않도록 설정
+                popUpTo(Routes.LOGIN) { inclusive = true }
+            }
+        } else if(isLoginSuccess == false)
+        {
+            loginAvailableMsg = "아이디나 비밀번호가 잘못 되었습니다.\n" +
+                    "아이디와 비밀번호를 정확히 입력해 주세요."
+        }
+        else{
+            loginAvailableMsg = ""
+        }
+    }
 
     // 아이디 입력 textfield
     var id by remember { mutableStateOf("") }
@@ -62,7 +87,43 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isVisible by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
+    // 스낵바
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val signupSuccess =
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.get<Boolean>("signupSuccess")
+
+
+    LaunchedEffect(signupSuccess) {
+        if (signupSuccess == true) {
+            snackbarHostState.showSnackbar(
+                message = "회원가입이 완료되었습니다",
+                duration = SnackbarDuration.Short
+            )
+
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("signupSuccess")
+        }
+    }
+
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            ) { data ->
+                Snackbar(
+                    containerColor = Color.Black.copy(alpha = 0.8f),
+                    contentColor = Color.White,
+                    snackbarData = data
+                )
+            }
+
+        }
+    ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -171,14 +232,6 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         viewModel.login(id, password)
-
-                        if(viewModel.isLoginSuccess.value) {
-                            // 홈 화면으로 이동
-                            navController.navigate(Routes.HOME)
-                        } else {
-                            loginAvailableMsg = "아이디나 비밀번호가 잘못 되었습니다.\n" +
-                                    "아이디와 비밀번호를 정확히 입력해 주세요."
-                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary,

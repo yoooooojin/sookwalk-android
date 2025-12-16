@@ -23,6 +23,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +51,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.sookwalk.R
 import com.example.sookwalk.data.local.entity.user.UserEntity
+import com.example.sookwalk.navigation.Routes
 import com.example.sookwalk.presentation.components.TopBar
 import com.example.sookwalk.presentation.viewmodel.UserViewModel
 import com.google.firebase.Firebase
@@ -66,10 +71,46 @@ fun MyPageScreen(
 
     val context = LocalContext.current
 
-    // --- 2. ViewModel의 StateFlow를 구독하여 Room DB의 사용자 정보를 실시간으로 받습니다. ---
+    // ViewModel의 StateFlow를 구독하여 Room DB의 사용자 정보를 실시간으로 받습니다.
     val currentUser by viewModel.currentUser.collectAsState()
 
+    // 스낵바
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val myPageEditSuccess =
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.get<Boolean>("myPageEditSuccess")
+
+
+    LaunchedEffect(myPageEditSuccess) {
+        if (myPageEditSuccess == true) {
+            snackbarHostState.showSnackbar(
+                message = "마이페이지 정보가 수정되었습니다",
+                duration = SnackbarDuration.Short
+            )
+
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("myPageEditSuccess")
+        }
+    }
+
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            ) { data ->
+                Snackbar(
+                    containerColor = Color.Black.copy(alpha = 0.8f),
+                    contentColor = Color.White,
+                    snackbarData = data
+                )
+            }
+
+        },
+
         topBar = {
             TopBar(
                 screenName = "마이페이지",
@@ -142,7 +183,7 @@ fun MyPageScreen(
                 // 프로필 수정 버튼
                 item {
                     Button(
-                        onClick = { navController.navigate("myPageEdit") },
+                        onClick = { navController.navigate(Routes.MYPAGE_EDIT) },
                         shape = RoundedCornerShape(28),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.tertiary,
