@@ -228,7 +228,7 @@ fun SignUpProfileScreen(
                                 vertical = 8.dp
                             )
                         ) {
-                            Text("중복 확인", style = MaterialTheme.typography.displaySmall)
+                            Text("중복 확인", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
