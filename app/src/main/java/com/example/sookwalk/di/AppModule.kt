@@ -126,9 +126,11 @@ object AppModule {
     fun provideMapRepository(
         favoriteDao: FavoriteDao,
         searchHistoryDao: SearchHistoryDao,
-        placesClient: PlacesClient
+        placesClient: PlacesClient,
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth
     ): MapRepository {
-        return MapRepository(favoriteDao, searchHistoryDao, placesClient)
+        return MapRepository(favoriteDao, searchHistoryDao, placesClient, firestore, auth)
     }
 
     @Provides

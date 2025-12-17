@@ -24,6 +24,14 @@ class MapViewModel @Inject constructor(
     private val repository: MapRepository
 ) : ViewModel() {
 
+    fun syncData() {
+        viewModelScope.launch {
+            _isSearching.value = true
+            repository.syncFromFirebase()
+            _isSearching.value = false
+        }
+    }
+
     val favoriteCategories = repository.allCategories.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
