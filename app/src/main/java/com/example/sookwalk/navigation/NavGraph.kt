@@ -66,35 +66,13 @@ fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
         authViewModel.checkLoginStatus()
     }
 
-    NavHost(navController = navController, startDestination = Routes.LOGIN) {
+    val startDest = if (isLoggedIn) Routes.HOME else Routes.LOGIN
 
-        ////// 첫 화면 //////
+    NavHost(navController = navController, startDestination = startDest) {
 
         composable(Routes.LOGIN) {
-            if (isLoggedIn) {
-                AppRightDrawer(
-                    drawerState = drawerState,
-                    userViewModel = userViewModel,
-                    navController = navController,
-                    scope = scope
-                ) {
-                    HomeScreen(
-                        goalViewModel, stepViewModel, navController,
-                        onBack = { navController.popBackStack() },
-                        onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                        onMenuClick = {
-                            scope.launch {
-                                if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                            }
-                        },
-                        onRankingBtnClick = { navController.navigate(Routes.RANK) },
-                        onGoToGoalsClick = { navController.navigate(Routes.GOALS) }
-                    )
-                }
-            } else
-                LoginScreen(authViewModel, navController)
+            LoginScreen(authViewModel, navController)
         }
-
 
         ////// TopBar에서 쓰이는 경로 //////
 
