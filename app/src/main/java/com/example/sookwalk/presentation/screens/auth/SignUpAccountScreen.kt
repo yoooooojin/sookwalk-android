@@ -243,7 +243,7 @@ fun SignUpAccountScreen(
                                     vertical = 8.dp
                                 )
                             ) {
-                                Text("중복 확인", style = MaterialTheme.typography.displaySmall)
+                                Text("중복 확인", style = MaterialTheme.typography.bodyLarge)
                             }
                         }
 
@@ -516,9 +516,9 @@ fun SignUpAccountScreen(
                                 )
                             ) {
                                 if(isEmailAvailable != true)
-                                    Text("중복 확인", style = MaterialTheme.typography.displaySmall)
+                                    Text("중복 확인", style = MaterialTheme.typography.bodyLarge)
                                 else {
-                                    Text("인증번호 전송", style = MaterialTheme.typography.displaySmall)
+                                    Text("인증번호 전송", style = MaterialTheme.typography.bodyLarge)
                                 }
                             }
                         }
@@ -594,7 +594,7 @@ fun SignUpAccountScreen(
                                 ),
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                             ) {
-                                Text("인증 확인", style = MaterialTheme.typography.displaySmall)
+                                Text("인증 확인", style = MaterialTheme.typography.bodyLarge)
                             }
                         }
                     }
