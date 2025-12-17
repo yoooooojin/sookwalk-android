@@ -42,7 +42,7 @@ import com.example.sookwalk.presentation.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
+fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
     val authViewModel: AuthViewModel = hiltViewModel() // 회원가입
     val userViewModel: UserViewModel = hiltViewModel() // 마이페이지 등
 
@@ -71,13 +71,13 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
         ////// 첫 화면 //////
 
         composable(Routes.LOGIN) {
-            AppRightDrawer(
-                drawerState = drawerState,
-                userViewModel = userViewModel,
-                navController = navController,
-                scope = scope
-            ) {
-                if (isLoggedIn) {
+            if (isLoggedIn) {
+                AppRightDrawer(
+                    drawerState = drawerState,
+                    userViewModel = userViewModel,
+                    navController = navController,
+                    scope = scope
+                ) {
                     HomeScreen(
                         goalViewModel, stepViewModel, navController,
                         onBack = { navController.popBackStack() },
@@ -90,9 +90,9 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                         onRankingBtnClick = { navController.navigate(Routes.RANK) },
                         onGoToGoalsClick = { navController.navigate(Routes.GOALS) }
                     )
-                } else
-                    LoginScreen(authViewModel, navController)
-            }
+                }
+            } else
+                LoginScreen(authViewModel, navController)
         }
 
 
@@ -110,15 +110,18 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     notificationViewModel, navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } }
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    }
                 )
             }
         }
 
         // 마이 페이지
         composable(Routes.MYPAGE) {
+
             MyPageScreen(userViewModel, navController)
         }
 
@@ -134,9 +137,11 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     badgeViewModel, navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } }
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    }
                 )
             }
         }
@@ -153,9 +158,11 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     settingsViewModel, navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } }
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    }
                 )
             }
         }
@@ -176,9 +183,11 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     goalViewModel, stepViewModel, /* 등등..? */  navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } },
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    },
                     onRankingBtnClick = { navController.navigate(Routes.RANK) },
                     onGoToGoalsClick = { navController.navigate(Routes.GOALS) }
 
@@ -245,9 +254,11 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
                     mapViewModel, navController,
                     onBack = { navController.popBackStack() },
                     onAlarmClick = { navController.navigate(Routes.NOTIFICATION) },
-                    onMenuClick = { scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    } }
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    }
                 )
             }
         }
@@ -260,7 +271,7 @@ fun NavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
         }
 
         composable(Routes.PROFILE) {
-            SignUpProfileScreen(authViewModel, userViewModel, majorViewModel,navController)
+            SignUpProfileScreen(authViewModel, userViewModel, majorViewModel, navController)
         }
 
         // 마이페이지 수정
