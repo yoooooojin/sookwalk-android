@@ -94,6 +94,21 @@ object NotificationHelper {
 
     // TODO: 목표 달성 알람을 띄우는 함수 - 걸음 수와 비교해서 달성 시
     fun showAchieveNotification(context: Context) {
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH // 높은 중요도여야 팝업이 뜹니다
+            ).apply {
+                description = "Main channel for notifications"
+            }
+            // 이 한 줄이 빠져서 시스템이 채널을 몰랐던 겁니다!
+            notificationManager.createNotificationChannel(channel)
+        }
+
         // 여기서 Navigation으로 이동할 페이지 데이터를 포함해서 구성하기
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
