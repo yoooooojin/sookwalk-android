@@ -36,6 +36,7 @@ import com.example.sookwalk.presentation.components.TopBar
 import com.example.sookwalk.presentation.viewmodel.AuthViewModel
 import com.example.sookwalk.presentation.viewmodel.BadgeViewModel
 import com.example.sookwalk.utils.notification.DateUtils.formatTimestamp
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +73,9 @@ fun BadgeScreen(
     val challengeLevel by viewModel.challengeLevel.collectAsState()
     val challengeDate by viewModel.stepDate.collectAsState()
 
+    // 스낵바
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     // 뱃지 리스트
     val badges = listOf(
@@ -80,31 +84,36 @@ fun BadgeScreen(
             "레벨 $stepLevel/5",
             R.drawable.ic_walking,
             "\uD83C\uDFC3\u200D♂\uFE0F ${totalSteps}보 걸었습니다!",
-            stepDate),
+            stepDate
+        ),
         BadgeInfo(
             "챌린지 고수",
             "레벨 $challengeLevel/5",
             R.drawable.ic_challenge,
             "\uD83D\uDD25 ${totalChallenges}개의 챌린지를 완수했습니다!",
-            challengeDate),
+            challengeDate
+        ),
         BadgeInfo(
             "추억 수집가",
             "레벨 $placeLevel/5",
             R.drawable.ic_photos,
             "\uD83D\uDCF7 ${totalPlaces}개의 장소를 저장했습니다!",
-            placeDate),
+            placeDate
+        ),
         BadgeInfo(
             "챔피언 워커",
             "레벨 $rankLevel/5",
             R.drawable.ic_champion,
             "\uD83D\uDC51 단과대 별 대항전에서\n${totalRanks}번 상위권에 들었습니다!",
-            rankDate),
+            rankDate
+        ),
         BadgeInfo(
             "의리왕",
             "레벨 1/5",
             R.drawable.ic_handshaking,
-            "\uD83E\uDD70 숙워크와 함께한지 50일 되었습니다!",
-            null),
+            "\uD83E\uDD70 숙워크와 함께한지 50일 되었습니다! (dummy 데이터) ",
+            null
+        ),
         BadgeInfo(null, null, null, "", null),
         BadgeInfo(null, null, null, "", null),
         BadgeInfo(null, null, null, "", null),
@@ -114,6 +123,17 @@ fun BadgeScreen(
     // 베스트 뱃지 찾기 - 각 뱃지의 실제 레벨(숫자)을 맵핑하여 비교
     val bestBadge = badges
         .filter { it.title != null } // 더미 데이터(null) 제외
+        .filter { badge ->
+            // 각 뱃지의 현재 레벨 숫자를 가져옴
+            val levelValue = when (badge.title) {
+                "워킹 마스터" -> stepLevel
+                "챌린지 고수" -> challengeLevel
+                "추억 수집가" -> placeLevel
+                "챔피언 워커" -> rankLevel
+                else -> 0
+            }
+            levelValue > 0 // 레벨이 0보다 큰 것만 남김
+        }
         .maxByOrNull { badge ->
             when (badge.title) {
                 "워킹 마스터" -> stepLevel
@@ -131,7 +151,8 @@ fun BadgeScreen(
         Dialog(onDismissRequest = { selectedBadge = null }) {
             val date = remember(selectedBadge?.date) {
                 selectedBadge?.date?.let { timestamp ->
-                    val sdf = java.text.SimpleDateFormat("yyyy.MM.dd", java.util.Locale.getDefault())
+                    val sdf =
+                        java.text.SimpleDateFormat("yyyy.MM.dd", java.util.Locale.getDefault())
                     sdf.format(timestamp.toDate())
                 } ?: "날짜 정보 없음"
             }
@@ -194,6 +215,19 @@ fun BadgeScreen(
     }
 
     Scaffold(
+
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            ) { data ->
+                Snackbar(
+                    containerColor = Color.Black.copy(alpha = 0.8f),
+                    contentColor = Color.White,
+                    snackbarData = data
+                )
+            }
+        },
+
         topBar = {
             TopBar(
                 screenName = "뱃지",
@@ -247,7 +281,20 @@ fun BadgeScreen(
             GreenGridContainer(
                 badges = badges,
                 onBadgeClick = { badge ->
-                    selectedBadge = badge
+
+                    // 레벨이 0인지 확인 (예: "레벨 0/5")
+                    val isLocked = badge.level?.contains("0/5") == true
+
+                    if (isLocked) {
+                        // 잠긴 경우 스낵바 실행
+                        scope.launch {
+                            snackbarHostState.showSnackbar("아직 획득하지 않은 뱃지입니다.")
+                        }
+                    } else {
+                        // 획득한 경우 팝업 노출
+                        selectedBadge = badge
+                    }
+
                 }
             )
         }
@@ -259,7 +306,7 @@ fun BadgeScreen(
 fun GreenGridContainer(
     badges: List<BadgeInfo>,
     onBadgeClick: (BadgeInfo) -> Unit
-    ) {
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -402,9 +449,9 @@ fun SmallBadgeCard(
         return
     }
 
-    Box(
-        modifier = Modifier.clickable { onClick() }
-    ) {
+    val isLocked = badge.level?.contains("0/5") == true
+
+    Box( modifier = Modifier.clickable{ onClick() } ) {
         Card(
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -413,36 +460,52 @@ fun SmallBadgeCard(
                 .fillMaxWidth()
                 .height(120.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                badge.imageRes?.let {
-                    Image(
-                        painter = painterResource(id = it),
-                        contentDescription = badge.title,
-                        modifier = Modifier.size(48.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    if(!isLocked){
+                        badge.imageRes?.let {
+                            Image(
+                                painter = painterResource(id = it),
+                                contentDescription = badge.title,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    } else {
+                        // 잠겨있을 때 보여줄 아이콘 혹은 빈 공간
+                        Icon(
+                            imageVector = Icons.Default.WorkspacePremium,
+                            contentDescription = null,
+                            tint = Color(0xFFE0E0E0), // 아주 연한 회색
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = if (isLocked) "???" else (badge.title ?: ""),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = badge.level ?: "",
+                        fontSize = 10.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = badge.title ?: "",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 14.sp
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = badge.level ?: "",
-                    fontSize = 10.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }
