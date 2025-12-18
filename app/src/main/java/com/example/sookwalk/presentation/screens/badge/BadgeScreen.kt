@@ -107,13 +107,7 @@ fun BadgeScreen(
             "\uD83D\uDC51 단과대 별 대항전에서\n${totalRanks}번 상위권에 들었습니다!",
             rankDate
         ),
-        BadgeInfo(
-            "의리왕",
-            "레벨 1/5",
-            R.drawable.ic_handshaking,
-            "\uD83E\uDD70 숙워크와 함께한지 50일 되었습니다! (dummy 데이터) ",
-            null
-        ),
+        BadgeInfo(null, null, null, "", null),
         BadgeInfo(null, null, null, "", null),
         BadgeInfo(null, null, null, "", null),
         BadgeInfo(null, null, null, "", null),
