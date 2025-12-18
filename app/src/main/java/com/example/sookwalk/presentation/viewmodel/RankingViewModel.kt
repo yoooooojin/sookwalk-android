@@ -23,28 +23,24 @@ class RankingViewModel @Inject constructor(
     private val collegeDummy = RankingDummy.college()
 
     val deptRanking: StateFlow<List<RankDto>> =
-        repository.observeDeptRanking(10)
+        repository.observeDeptRanking()
             .map { list ->
-                val mapped = list.map { dto ->
-                    dto.copy(name = deptNameFromId(dto.id))
-                }.sortedByDescending { it.walkCount }
+                val mapped = list
+                    .map { dto -> dto.copy(name = deptNameFromId(dto.id)) }
+                    .sortedByDescending { it.walkCount }
 
-                val fixedRank = mapped.mapIndexed { idx, dto -> dto.copy(rank = idx + 1) }
-
-                if (fixedRank.isEmpty()) deptDummy else fixedRank
+                if (mapped.isEmpty()) deptDummy else mapped
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), deptDummy)
 
     val collegeRanking: StateFlow<List<RankDto>> =
-        repository.observeCollegeRanking(10)
+        repository.observeCollegeRanking()
             .map { list ->
-                val mapped = list.map { dto ->
-                    dto.copy(name = collegeNameFromId(dto.id))
-                }.sortedByDescending { it.walkCount }
+                val mapped = list
+                    .map { dto -> dto.copy(name = collegeNameFromId(dto.id)) }
+                    .sortedByDescending { it.walkCount }
 
-                val fixedRank = mapped.mapIndexed { idx, dto -> dto.copy(rank = idx + 1) }
-
-                if (fixedRank.isEmpty()) collegeDummy else fixedRank
+                if (mapped.isEmpty()) deptDummy else mapped
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), collegeDummy)
 

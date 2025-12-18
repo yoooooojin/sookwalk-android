@@ -168,7 +168,7 @@ fun RankingCard(rank: RankDto){
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row() {
-                Text("${rank.rank}순위")
+                Text("${rank.rank}위")
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(rank.name)
             }
