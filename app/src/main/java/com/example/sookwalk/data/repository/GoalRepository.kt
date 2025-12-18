@@ -4,23 +4,15 @@ import android.content.Context
 import android.util.Log
 import com.example.sookwalk.data.local.dao.GoalDao
 import com.example.sookwalk.data.local.entity.goal.GoalEntity
-import com.example.sookwalk.data.remote.dto.GoalDto
-import com.example.sookwalk.utils.notification.NotificationHelper
 import com.example.sookwalk.utils.notification.NotificationHelper.showAchieveNotification
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.firestore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -29,13 +21,13 @@ class GoalRepository @Inject constructor(
     private val dao: GoalDao,
     private val db: FirebaseFirestore,
     private val auth: FirebaseAuth,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context // 알림용 컨텍스트
 ){
     private fun col(uid: String) =
         db.collection("users").document(uid).collection("goals")
 
-    // 오늘 이미 알림을 보낸 목표 ID 저장 (중복 알림 방지)
     private val notifiedGoalIds = mutableSetOf<Int>()
+
     suspend fun insertGoal(uid: String, goal: GoalEntity): Long {
         val newDocRef = col(uid).document()
         val remoteId = newDocRef.id
@@ -43,23 +35,21 @@ class GoalRepository @Inject constructor(
         val goalWithRemote = goal.copy(remoteId = remoteId)
         val localId = dao.insert(goalWithRemote)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val goalMap = hashMapOf(
-                    "remoteId" to remoteId,
-                    "title" to goal.title,
-                    "targetSteps" to goal.targetSteps,
-                    "currentSteps" to goal.currentSteps,
-                    "startDate" to goal.startDate,
-                    "endDate" to goal.endDate,
-                    "memo" to goal.memo,
-                    "isDone" to goal.isDone,
-                    "updatedAt" to Timestamp.now()
-                )
-                newDocRef.set(goalMap).await()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        try {
+            val goalMap = hashMapOf(
+                "remoteId" to remoteId,
+                "title" to goal.title,
+                "targetSteps" to goal.targetSteps,
+                "currentSteps" to goal.currentSteps,
+                "startDate" to goal.startDate,
+                "endDate" to goal.endDate,
+                "memo" to goal.memo,
+                "isDone" to goal.isDone,
+                "updatedAt" to Timestamp.now()
+            )
+            newDocRef.set(goalMap).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         return localId
@@ -122,8 +112,7 @@ class GoalRepository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("GoalRepository", "Goals sync failed: ${e.message}")
-            e.printStackTrace()
+            Log.e("GoalRepository", "Goals sync failed: ${e.message}")
         }
     }
 
@@ -158,25 +147,20 @@ class GoalRepository @Inject constructor(
         val uid = auth.currentUser?.uid ?: return false
 
         val beforeGoals = dao.getTodayAllGoals(today)
-        val unfinishedBefore = beforeGoals.filter { !it.isDone }.map { it.remoteId }.toSet()
         val unfinishedBeforeIds = beforeGoals.filter { !it.isDone }.map { it.id }.toSet()
+        val unfinishedBeforeRemoteIds = beforeGoals.filter { !it.isDone }.map { it.remoteId }.toSet()
 
         dao.incrementStepsForActiveGoals(stepsDelta, today)
         dao.checkAndMarkCompletedGoals()
 
         val afterGoals = dao.getTodayAllGoals(today)
 
-        // [목표 달성 알림 핵심]
         afterGoals.forEach { goal ->
-            // 아까는 미완료였는데(unfinishedBeforeIds), 지금은 완료(isDone)인 경우
             if (goal.isDone && unfinishedBeforeIds.contains(goal.id)) {
-                // 오늘 이 목표로 알림을 보낸 적이 없다면
                 if (!notifiedGoalIds.contains(goal.id)) {
-
-                    // 여기서 바로 알림 전송! (이게 우리가 원하는 거니까요)
                     try {
-                        showAchieveNotification(context)
-                        notifiedGoalIds.add(goal.id) // 보낸 목록에 즉시 추가
+                        showAchieveNotification(context) // 알림 발생!
+                        notifiedGoalIds.add(goal.id)
                         Log.d("ALARM_SUCCESS", "🎉 알림 전송 성공: ${goal.title}")
                     } catch (e: Exception) {
                         Log.e("ALARM_ERROR", "알림 띄우기 실패: ${e.message}")
@@ -184,7 +168,8 @@ class GoalRepository @Inject constructor(
                 }
             }
         }
-        val newlyCompletedGoals = afterGoals.filter { it.isDone && unfinishedBefore.contains(it.remoteId) }
+
+        val newlyCompletedGoals = afterGoals.filter { it.isDone && unfinishedBeforeRemoteIds.contains(it.remoteId) }
 
         if (newlyCompletedGoals.isNotEmpty()) {
             updateStatsChallengeCount(uid, newlyCompletedGoals.size)
@@ -208,36 +193,33 @@ class GoalRepository @Inject constructor(
         if (goal.remoteId.isEmpty()) return
 
         try {
-            val updates = mapOf(
+            val updates = hashMapOf(
+                "remoteId" to goal.remoteId,
+                "title" to goal.title,
+                "targetSteps" to goal.targetSteps,
                 "currentSteps" to goal.currentSteps,
+                "startDate" to goal.startDate,
+                "endDate" to goal.endDate,
                 "isDone" to goal.isDone,
                 "updatedAt" to Timestamp.now()
             )
-            col(uid).document(goal.remoteId).update(updates).await()
+            col(uid).document(goal.remoteId).set(updates, SetOptions.merge()).await()
         } catch (e: Exception) {
-            android.util.Log.e("FIREBASE_SYNC", "목표 진행률 업데이트 실패: ${e.message}")
-            e.printStackTrace()
+            Log.e("FIREBASE_SYNC", "목표 진행률 저장 실패: ${e.message}")
         }
     }
 
-    private fun statsCol() = db.collection("users").document(auth.currentUser?.uid ?: "").collection("stats")
-
     private suspend fun updateStatsChallengeCount(uid: String, incrementValue: Int) {
         try {
-            val statsDoc = db.collection("users")
-                .document(uid)
-                .collection("stats")
-                .document("challenge")
-
+            val statsDoc = db.collection("users").document(uid).collection("stats").document("challenge")
             val data = mapOf(
                 "total" to FieldValue.increment(incrementValue.toLong()),
                 "date" to Timestamp.now()
             )
-
             statsDoc.set(data, SetOptions.merge()).await()
-            android.util.Log.d("GoalRepo", "✅ 누적 완수 개수 $incrementValue 증가 완료")
+            Log.d("GoalRepo", "✅ 누적 완수 개수 $incrementValue 증가 완료")
         } catch (e: Exception) {
-            android.util.Log.e("GoalRepo", "❌ 누적 개수 반영 실패: ${e.message}")
+            Log.e("GoalRepo", "❌ 누적 개수 반영 실패: ${e.message}")
         }
     }
 }
