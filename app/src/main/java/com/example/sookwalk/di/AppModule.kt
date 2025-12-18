@@ -105,6 +105,7 @@ object AppModule {
     fun provideStepRepository(
         stepDao: StepDao,
         db: FirebaseFirestore,
+        goalRepo: GoalRepository,
         @ApplicationContext context: Context
     ): StepRepository {
         return StepRepository(stepDao, db, context)
